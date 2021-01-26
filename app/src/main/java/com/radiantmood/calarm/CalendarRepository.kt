@@ -19,7 +19,7 @@ class CalendarRepository {
 
         init {
             val builder: Uri.Builder = Calendars.CONTENT_URI.buildUpon()
-            val contentResolver: ContentResolver = app.contentResolver
+            val contentResolver: ContentResolver = calarm.contentResolver
             cursor = checkNotNull(contentResolver.query(builder.build(), CAL_PROJECTION, null, null, null))
         }
 

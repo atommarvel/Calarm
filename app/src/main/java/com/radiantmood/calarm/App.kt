@@ -1,14 +1,19 @@
 package com.radiantmood.calarm
 
-import android.app.Application
+import android.app.Activity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.ui.platform.AmbientContext
+import androidx.navigation.compose.rememberNavController
 
-lateinit var app: App
-    private set
+val Permissions = staticAmbientOf<PermissionsKit> { error("No permissions") }
 
-class App : Application() {
+@Composable
+fun App(activity: Activity) {
+    AmbientContext.provides(activity)
+    Permissions.provides(PermissionsKit(activity))
 
-    override fun onCreate() {
-        super.onCreate()
-        app = this
-    }
+    val navController = rememberNavController()
+
+    getNavHost(navController = navController, isCalendarPermissionGranted =)
 }

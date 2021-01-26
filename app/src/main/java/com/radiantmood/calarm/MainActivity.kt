@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
-    private val permissions by lazy { Permissions(this) }
+    private val permissions by lazy { PermissionsKit(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
