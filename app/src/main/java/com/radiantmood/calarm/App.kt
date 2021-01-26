@@ -2,15 +2,17 @@ package com.radiantmood.calarm
 
 import android.app.Activity
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.runtime.Providers
+import androidx.compose.runtime.ambientOf
 import androidx.navigation.compose.rememberNavController
 
-val Permissions = staticAmbientOf<PermissionsKit> { error("No permissions") }
+val Permissions = ambientOf<PermissionsKit> { error("No permissions") }
 
 @Composable
 fun App(activity: Activity) {
-    Permissions.provides(PermissionsKit(activity))
-
+    val permissions = PermissionsKit(activity)
     val navController = rememberNavController()
-    getNavHost(navController = navController)
+    Providers(Permissions provides permissions) {
+        InitNavHost(navController = navController)
+    }
 }

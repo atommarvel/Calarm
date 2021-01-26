@@ -14,15 +14,23 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
 
 @Composable
-fun CalendarsScreen(calendarList: List<CalendarRepository.UserCal>, finished: (List<CalendarRepository.UserCal>) -> Unit) {
+fun CalendarsScreen(calendarList: List<CalendarRepository.UserCal>, navController: NavController) {
+    val permissions = Permissions.current
+    if (!permissions.isCalendarPermissionGranted) {
+        navController.navigate("permission")
+    }
+
     val selectedIds = remember { mutableStateListOf<Int>() }
     Column {
         TopAppBar(title = { Text("Select Calendars to use") }, actions = {
             IconButton(onClick = {
                 val selectedCalendars = calendarList.filter { selectedIds.contains(it.id) }
-                finished(selectedCalendars)
+                // TODO: save calendar selection to a repository of some sort
+                navController.popBackStack()
             }) {
                 Icon(imageVector = Icons.Default.Check)
             }

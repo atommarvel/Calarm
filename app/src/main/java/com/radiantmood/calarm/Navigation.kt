@@ -7,15 +7,12 @@ import androidx.navigation.compose.composable
 
 
 @Composable
-fun getNavHost(navController: NavHostController, isCalendarPermissionGranted: Boolean) {
-    NavHost(navController, "root") {
-        composable("root") { RootScreen(navController) }
-        composable("permission") { PermissionScreen() }
-        composable("alarms") { AlarmsScreen(onClickCalendars = { /*TODO: use nav controller to handle this click*/ }) }
+fun InitNavHost(navController: NavHostController) {
+    NavHost(navController, "alarms") {
+        composable("alarms") { AlarmsScreen(navController) }
+        composable("permission") { PermissionScreen(navController) }
         composable("calendars") {
-            CalendarsScreen(
-                calendarList = emptyList(),
-                finished = { /*TODO: use nav controller to go back*/ })
+            CalendarsScreen(calendarList = emptyList(), navController)
         } // TODO: obtain calendar list
     }
 }
