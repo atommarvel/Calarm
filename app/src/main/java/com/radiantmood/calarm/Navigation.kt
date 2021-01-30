@@ -11,8 +11,6 @@ fun InitNavHost(navController: NavHostController) {
     NavHost(navController, "alarms") {
         composable("alarms") { AlarmsScreen(navController) }
         composable("permission") { PermissionScreen(navController) }
-        composable("calendars") {
-            CalendarsScreen(calendarList = emptyList(), navController)
-        } // TODO: obtain calendar list
+        composable("calendars") { CalendarsScreen(navController) }
     }
 }

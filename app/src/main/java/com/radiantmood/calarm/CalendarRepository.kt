@@ -3,10 +3,9 @@ package com.radiantmood.calarm
 import android.content.ContentResolver
 import android.database.Cursor
 import android.net.Uri
-import android.provider.CalendarContract
 import android.provider.CalendarContract.Calendars
-import android.provider.CalendarContract.Events.DTSTART
-import android.provider.CalendarContract.Events.TITLE
+import android.provider.CalendarContract.Events.*
+import android.text.format.DateUtils
 import androidx.annotation.WorkerThread
 import java.util.*
 
@@ -16,7 +15,10 @@ class CalendarRepository {
     @WorkerThread
     suspend fun queryCalendars(): List<UserCal> = CalendarCursor().map { it }
 
-    class CalendarCursor: Iterable<UserCal> {
+    @WorkerThread
+    suspend fun queryEvents(): List<CalEvent> = EventCursor().map { it }
+
+    class CalendarCursor : Iterable<UserCal> {
 
         val cursor: Cursor
         private val CAL_PROJECTION = arrayOf(Calendars._ID, Calendars.CALENDAR_DISPLAY_NAME)
@@ -30,7 +32,7 @@ class CalendarRepository {
         override fun iterator(): Iterator<UserCal> = object : Iterator<UserCal> {
             var index = 0
 
-            override fun hasNext(): Boolean = index < cursor.count
+            override fun hasNext(): Boolean = (index < cursor.count).also { if (!it) cursor.close() }
 
             override fun next(): UserCal = UserCal.fromCursor(cursor, index).also { index++ }
 
@@ -52,15 +54,20 @@ class CalendarRepository {
         private val EVENT_PROJECTION: Array<String> = arrayOf(TITLE, DTSTART)
 
         init {
-            val builder: Uri.Builder = Calendars.CONTENT_URI.buildUpon()
+            val builder: Uri.Builder = CONTENT_URI.buildUpon()
+
+            val start = System.currentTimeMillis()
+            val end = start + DateUtils.DAY_IN_MILLIS
+            // TODO: only query for selected calendars
             val contentResolver: ContentResolver = calarm.contentResolver
-            cursor = checkNotNull(contentResolver.query(builder.build(), EVENT_PROJECTION, null, null, null))
+            val selection = "(( $DTSTART >= $start ) AND ( $DTSTART <= $end ))"
+            cursor = checkNotNull(contentResolver.query(builder.build(), EVENT_PROJECTION, selection, null, null))
         }
 
         override fun iterator(): Iterator<CalEvent> = object : Iterator<CalEvent> {
             var index = 0
 
-            override fun hasNext(): Boolean = index < cursor.count
+            override fun hasNext(): Boolean = (index < cursor.count).also { if (!it) cursor.close() }
 
             override fun next(): CalEvent = CalEvent.fromCursor(cursor, index).also { index++ }
 
