@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.radiantmood.calarm.CalendarRepository.CalEvent
@@ -27,7 +28,7 @@ fun AlarmsScreen(navController: NavController) {
 
     Column {
         TopAppBar(title = { Text("Today's Alarms") }, actions = {
-            AppBarAction(drawableRes = R.drawable.ic_baseline_calendar_today_24) {
+            AppBarAction(vectorResource(R.drawable.ic_baseline_calendar_today_24)) {
                 navController.navigate("calendars")
             }
         })
