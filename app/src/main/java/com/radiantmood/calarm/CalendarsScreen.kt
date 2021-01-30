@@ -18,12 +18,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.NavController
 import com.radiantmood.calarm.CalendarRepository.UserCal
 
 @Composable
-fun CalendarsActivityScreen(navController: NavController, vm: MainViewModel) {
+fun CalendarsActivityScreen(navController: NavController) {
     Permissions.current.checkPermission(navController)
+    val vm: MainViewModel = viewModel()
     val calendars: List<CalendarDisplay> by vm.calendarDisplays.observeAsState(listOf())
     vm.getCalendarDisplays()
 

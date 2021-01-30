@@ -86,4 +86,6 @@ class CalendarRepository {
             }
         }
     }
+
+    data class UserAlarm(val date: Calendar)
 }

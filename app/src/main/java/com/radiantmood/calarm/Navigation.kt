@@ -7,10 +7,10 @@ import androidx.navigation.compose.composable
 
 
 @Composable
-fun InitNavHost(navController: NavHostController, vm: MainViewModel) {
+fun InitNavHost(navController: NavHostController) {
     NavHost(navController, "alarms") {
         composable("alarms") { AlarmsScreen(navController) }
         composable("permission") { PermissionScreen(navController) }
-        composable("calendars") { CalendarsActivityScreen(navController, vm) }
+        composable("calendars") { CalendarsActivityScreen(navController) }
     }
 }

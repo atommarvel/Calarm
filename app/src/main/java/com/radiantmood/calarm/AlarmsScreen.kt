@@ -1,30 +1,28 @@
 package com.radiantmood.calarm
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.radiantmood.calarm.CalendarRepository.CalEvent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+
 
 const val TAG = "araiff"
 
 @Composable
-fun fetchCalEvents(): List<CalEvent>? = composableFetch {
-    val calRepo = CalendarRepository()
-    withContext(Dispatchers.Default) { calRepo.queryEvents() }
-}
-
-@Composable
 fun AlarmsScreen(navController: NavController) {
     Permissions.current.checkPermission(navController)
+    val vm: MainViewModel = viewModel()
+    val events: List<EventDisplay> by vm.eventDisplays.observeAsState(listOf())
+    vm.getEventDisplays()
 
     Column {
         TopAppBar(title = { Text("Today's Alarms") }, actions = {
@@ -32,14 +30,13 @@ fun AlarmsScreen(navController: NavController) {
                 navController.navigate("calendars")
             }
         })
-        fetchCalEvents()?.let { events ->
-            Log.d(TAG, "AlarmsScreen: events")
-            LazyColumn {
-                items(events) { event ->
-                    Text(event.title)
-                }
+        LazyColumn {
+            items(events) { event ->
+                Text(event.calEvent.title)
             }
         }
         // TODO: Loading
     }
 }
+
+data class EventDisplay(val calEvent: CalEvent)

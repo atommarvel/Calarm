@@ -10,11 +10,20 @@ class MainViewModel() : ViewModel() {
     private var _calendarDisplays = MutableLiveData(listOf<CalendarDisplay>())
     val calendarDisplays: LiveData<List<CalendarDisplay>> = _calendarDisplays
 
+    private var _eventDisplays = MutableLiveData(listOf<EventDisplay>())
+    val eventDisplays: LiveData<List<EventDisplay>> = _eventDisplays
+
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
     private val calendarRepo = CalendarRepository()
 
+    fun getEventDisplays() = viewModelScope.launch {
+        val selectedIds = selectedCalendarsRepo.getAll()
+        val events = calendarRepo.queryEvents().map { EventDisplay(it) }
+        _eventDisplays.postValue(events)
+    }
+
     fun getCalendarDisplays() = viewModelScope.launch {
-        postUpdate()
+        postCalendarUpdate()
     }
 
     fun toggleSelectedCalendarId(id: Int) = viewModelScope.launch {
@@ -22,10 +31,10 @@ class MainViewModel() : ViewModel() {
         if (ids.contains(id)) {
             selectedCalendarsRepo.remove(id)
         } else selectedCalendarsRepo.add(id)
-        postUpdate()
+        postCalendarUpdate()
     }
 
-    private suspend fun postUpdate() {
+    private suspend fun postCalendarUpdate() {
         _calendarDisplays.postValue(constructDisplays())
     }
 
