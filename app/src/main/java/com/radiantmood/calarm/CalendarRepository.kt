@@ -21,12 +21,12 @@ class CalendarRepository {
     class CalendarCursor : Iterable<UserCal> {
 
         val cursor: Cursor
-        private val CAL_PROJECTION = arrayOf(Calendars._ID, Calendars.CALENDAR_DISPLAY_NAME)
+        private val projection = arrayOf(Calendars._ID, Calendars.CALENDAR_DISPLAY_NAME)
 
         init {
             val builder: Uri.Builder = Calendars.CONTENT_URI.buildUpon()
             val contentResolver: ContentResolver = calarm.contentResolver
-            cursor = checkNotNull(contentResolver.query(builder.build(), CAL_PROJECTION, null, null, null))
+            cursor = checkNotNull(contentResolver.query(builder.build(), projection, null, null, null))
         }
 
         override fun iterator(): Iterator<UserCal> = object : Iterator<UserCal> {
@@ -48,10 +48,14 @@ class CalendarRepository {
         }
     }
 
-    class EventCursor: Iterable<CalEvent> {
+    /**
+     * https://stackoverflow.com/questions/26844770/how-to-get-access-to-the-calendars-on-a-android-phone
+     * https://github.com/CyanogenMod/android_packages_apps_Calendar/blob/cm-12.0/src/com/android/calendar/Event.java#L307
+     */
+    class EventCursor : Iterable<CalEvent> {
 
         val cursor: Cursor
-        private val EVENT_PROJECTION: Array<String> = arrayOf(CALENDAR_ID, TITLE, DTSTART)
+        private val projection: Array<String> = arrayOf(CALENDAR_ID, TITLE, DTSTART)
 
         init {
             val builder: Uri.Builder = CONTENT_URI.buildUpon()
@@ -61,7 +65,7 @@ class CalendarRepository {
             // TODO: only query for selected calendars
             val contentResolver: ContentResolver = calarm.contentResolver
             val selection = "(( $DTSTART >= $start ) AND ( $DTSTART <= $end ))"
-            cursor = checkNotNull(contentResolver.query(builder.build(), EVENT_PROJECTION, selection, null, null))
+            cursor = checkNotNull(contentResolver.query(builder.build(), projection, selection, null, null))
         }
 
         override fun iterator(): Iterator<CalEvent> = object : Iterator<CalEvent> {
