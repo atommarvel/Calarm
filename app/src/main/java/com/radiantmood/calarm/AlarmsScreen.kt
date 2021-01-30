@@ -1,5 +1,6 @@
 package com.radiantmood.calarm
 
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,8 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.viewinterop.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.radiantmood.calarm.CalendarRepository.CalEvent
 
@@ -18,9 +17,11 @@ import com.radiantmood.calarm.CalendarRepository.CalEvent
 const val TAG = "araiff"
 
 @Composable
-fun AlarmsScreen(navController: NavController) {
-    Permissions.current.checkPermission(navController)
-    val vm: MainViewModel = viewModel()
+fun AlarmsScreen() {
+    val navController = AmbientNavController.current
+    AmbientPermissions.current.checkPermission(navController)
+
+    val vm = AmbientMainViewModel.current
     val events: List<EventDisplay> by vm.eventDisplays.observeAsState(listOf())
     vm.getEventDisplays()
 

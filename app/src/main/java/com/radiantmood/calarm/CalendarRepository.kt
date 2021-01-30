@@ -51,7 +51,7 @@ class CalendarRepository {
     class EventCursor: Iterable<CalEvent> {
 
         val cursor: Cursor
-        private val EVENT_PROJECTION: Array<String> = arrayOf(TITLE, DTSTART)
+        private val EVENT_PROJECTION: Array<String> = arrayOf(CALENDAR_ID, TITLE, DTSTART)
 
         init {
             val builder: Uri.Builder = CONTENT_URI.buildUpon()
@@ -75,14 +75,14 @@ class CalendarRepository {
 
     }
 
-    data class CalEvent(val title: String, val date: Calendar) {
+    data class CalEvent(val calId: Int, val title: String, val date: Calendar) {
         companion object {
             fun fromCursor(cursor: Cursor, position: Int): CalEvent {
                 cursor.moveToPosition(position)
                 val date = Calendar.getInstance().apply {
-                    timeInMillis = cursor.getLong(1)
+                    timeInMillis = cursor.getLong(2)
                 }
-                return CalEvent(cursor.getString(0), date)
+                return CalEvent(cursor.getInt(0), cursor.getString(1), date)
             }
         }
     }

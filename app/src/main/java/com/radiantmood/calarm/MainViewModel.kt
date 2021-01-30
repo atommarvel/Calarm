@@ -6,7 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-class MainViewModel() : ViewModel() {
+// TODO: move up to being created at App() level
+class MainViewModel : ViewModel() {
     private var _calendarDisplays = MutableLiveData(listOf<CalendarDisplay>())
     val calendarDisplays: LiveData<List<CalendarDisplay>> = _calendarDisplays
 
@@ -18,8 +19,9 @@ class MainViewModel() : ViewModel() {
 
     fun getEventDisplays() = viewModelScope.launch {
         val selectedIds = selectedCalendarsRepo.getAll()
-        val events = calendarRepo.queryEvents().map { EventDisplay(it) }
-        _eventDisplays.postValue(events)
+        val events = calendarRepo.queryEvents()
+        val eventDisplays = events.filter { selectedIds.contains(it.calId) }.map { EventDisplay(it) }
+        _eventDisplays.postValue(eventDisplays)
     }
 
     fun getCalendarDisplays() = viewModelScope.launch {
