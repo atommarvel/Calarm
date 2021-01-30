@@ -3,8 +3,12 @@ package com.radiantmood.calarm
 import android.content.ContentResolver
 import android.database.Cursor
 import android.net.Uri
+import android.provider.CalendarContract
 import android.provider.CalendarContract.Calendars
+import android.provider.CalendarContract.Events.DTSTART
+import android.provider.CalendarContract.Events.TITLE
 import androidx.annotation.WorkerThread
+import java.util.*
 
 
 class CalendarRepository {
@@ -42,14 +46,37 @@ class CalendarRepository {
         }
     }
 
-    class EventCursor {
+    class EventCursor: Iterable<CalEvent> {
 
-        private val EVENT_PROJECTION: Array<String> = arrayOf(
-            Calendars._ID,                     // 0
-            Calendars.ACCOUNT_NAME,            // 1
-            Calendars.CALENDAR_DISPLAY_NAME,   // 2
-            Calendars.OWNER_ACCOUNT            // 3
-        )
+        val cursor: Cursor
+        private val EVENT_PROJECTION: Array<String> = arrayOf(TITLE, DTSTART)
 
+        init {
+            val builder: Uri.Builder = Calendars.CONTENT_URI.buildUpon()
+            val contentResolver: ContentResolver = calarm.contentResolver
+            cursor = checkNotNull(contentResolver.query(builder.build(), EVENT_PROJECTION, null, null, null))
+        }
+
+        override fun iterator(): Iterator<CalEvent> = object : Iterator<CalEvent> {
+            var index = 0
+
+            override fun hasNext(): Boolean = index < cursor.count
+
+            override fun next(): CalEvent = CalEvent.fromCursor(cursor, index).also { index++ }
+
+        }
+
+    }
+
+    data class CalEvent(val title: String, val date: Calendar) {
+        companion object {
+            fun fromCursor(cursor: Cursor, position: Int): CalEvent {
+                cursor.moveToPosition(position)
+                val date = Calendar.getInstance().apply {
+                    timeInMillis = cursor.getLong(1)
+                }
+                return CalEvent(cursor.getString(0), date)
+            }
+        }
     }
 }
