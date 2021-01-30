@@ -31,7 +31,7 @@ fun Fullscreen(content: @Composable ColumnScope.() -> Unit) {
 @Composable
 fun AppBarAction(@DrawableRes drawableRes: Int, onClick: () -> Unit) {
     IconButton(onClick) {
-        Icon(vectorResource(R.drawable.ic_baseline_calendar_today_24))
+        Icon(vectorResource(R.drawable.ic_baseline_calendar_today_24), null)
     }
 }
 

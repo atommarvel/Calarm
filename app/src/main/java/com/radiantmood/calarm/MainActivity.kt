@@ -1,13 +1,13 @@
 package com.radiantmood.calarm
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
+
+    private val mainVM by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,10 +17,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    private fun fetchAndRenderCalendars() = lifecycleScope.launch {
-        val calRepo = CalendarRepository()
-        val calendars = withContext(Dispatchers.Default) { calRepo.queryCalendars() }
-    }
-
 }

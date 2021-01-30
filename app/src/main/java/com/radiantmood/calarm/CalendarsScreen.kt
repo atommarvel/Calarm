@@ -6,68 +6,64 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.radiantmood.calarm.CalendarRepository.UserCal
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
-fun fetchCalendars(): List<UserCal>? = composableFetch {
-    val calRepo = CalendarRepository()
-    withContext(Dispatchers.Default) { calRepo.queryCalendars() }
-}
-
-@Composable
-fun CalendarsScreen(navController: NavController) {
+fun CalendarsActivityScreen(navController: NavController, vm: MainViewModel) {
     Permissions.current.checkPermission(navController)
-    val selectedIds = remember { mutableStateListOf<Int>() }
-    fetchCalendars()?.let { calendarList ->
-        Column {
-            TopAppBar(title = { Text("Select Calendars to use") }, actions = {
-                IconButton(onClick = {
-                    val selectedCalendars = calendarList.filter { selectedIds.contains(it.id) }
-                    // TODO: save calendar selection to a repository of some sort
-                    navController.popBackStack()
-                }) {
-                    Icon(imageVector = Icons.Default.Check)
-                }
-            })
-            CalendarList(calendarList, selectedIds) {
-                selectedIds.toggle(it.id)
+    val calendars: List<CalendarDisplay> by vm.calendarDisplays.observeAsState(listOf())
+    vm.getCalendarDisplays()
+
+    Column {
+        TopAppBar(title = { Text("Select Calendars to use") }, actions = {
+            // TODO: appbaricon
+            IconButton(onClick = {
+                // val selectedCalendars = calendarList.filter { selectedIds.contains(it.id) }
+                // TODO: save calendar selection to a repository of some sort
+                navController.popBackStack()
+            }) {
+                Icon(Icons.Default.Check, null)
             }
+        })
+        CalendarList(calendars) {
+            vm.toggleSelectedCalendarId(it.userCal.id)
         }
     }
-    // TODO: loading view while waiting?
 }
 
+data class CalendarDisplay(val userCal: UserCal, val isSelected: Boolean)
+
 @Composable
-fun CalendarList(calendarList: List<UserCal>, selectedIds: List<Int>, selectCalendar: (UserCal) -> Unit) {
+fun CalendarList(calendars: List<CalendarDisplay>, selectCalendar: (CalendarDisplay) -> Unit) {
+    // TODO: loading view while waiting?
     LazyColumn {
-        items(calendarList) { calendar ->
-            CalendarRow(calendar, selectedIds.contains(calendar.id), selectCalendar)
+        items(calendars) { calendar ->
+            CalendarRow(calendar, selectCalendar)
             Divider()
         }
     }
 }
 
 @Composable
-fun CalendarRow(calendar: UserCal, isSelected: Boolean, selectCalendar: (UserCal) -> Unit) {
+fun CalendarRow(calendar: CalendarDisplay, selectCalendar: (CalendarDisplay) -> Unit) {
     Row(
         modifier = Modifier
             .clickable(onClick = { selectCalendar(calendar) })
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(text = calendar.name, Modifier.weight(1f))
-        Switch(checked = isSelected, onCheckedChange = {
+        Text(text = calendar.userCal.name, Modifier.weight(1f))
+        Switch(checked = calendar.isSelected, onCheckedChange = {
             selectCalendar(calendar)
         })
     }
