@@ -1,3 +1,3 @@
 package com.radiantmood.calarm.util
 
-const val TAG = "araiff"
+const val TAG = "calarm"

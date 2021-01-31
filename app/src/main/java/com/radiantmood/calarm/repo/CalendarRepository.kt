@@ -6,7 +6,6 @@ import android.net.Uri
 import android.provider.CalendarContract.Calendars
 import androidx.annotation.WorkerThread
 import com.radiantmood.calarm.calarm
-import java.util.*
 
 
 class CalendarRepository {
@@ -43,6 +42,4 @@ class CalendarRepository {
             }
         }
     }
-
-    data class UserAlarm(val date: Calendar)
 }

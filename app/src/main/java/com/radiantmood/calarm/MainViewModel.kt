@@ -1,14 +1,19 @@
 package com.radiantmood.calarm
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.radiantmood.calarm.repo.AlarmRepository
+import com.radiantmood.calarm.repo.AlarmRepository.UserAlarm
 import com.radiantmood.calarm.repo.CalendarRepository
 import com.radiantmood.calarm.repo.EventRepository
 import com.radiantmood.calarm.repo.SelectedCalendarsRepository
 import com.radiantmood.calarm.screen.CalendarDisplay
 import com.radiantmood.calarm.screen.EventDisplay
+import com.radiantmood.calarm.util.AlarmUtil
+import com.radiantmood.calarm.util.TAG
 import kotlinx.coroutines.launch
 
 // TODO: move up to being created at App() level
@@ -22,10 +27,18 @@ class MainViewModel : ViewModel() {
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
     private val calendarRepo = CalendarRepository()
     private val eventRepo = EventRepository()
+    private val alarmRepo = AlarmRepository()
+    private val alarmUtil = AlarmUtil()
+
+    fun scheduleAlarm(alarm: UserAlarm = alarmRepo.getOneMinDebugAlarm()) {
+        alarmUtil.scheduleAlarm(alarm.calendar)
+    }
 
     fun getEventDisplays() = viewModelScope.launch {
         val selectedIds = selectedCalendarsRepo.getAll()
         val events = eventRepo.queryEvents()
+        val alarms = alarmRepo.queryAlarms()
+        Log.d(TAG, "getEventDisplays: $alarms")
         val eventDisplays = events.filter { selectedIds.contains(it.calId) }.map { EventDisplay(it) }
         _eventDisplays.postValue(eventDisplays)
     }

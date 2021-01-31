@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.radiantmood.calarm.AmbientMainViewModel
 import com.radiantmood.calarm.AmbientNavController
-import com.radiantmood.calarm.AmbientPermissions
+import com.radiantmood.calarm.AmbientPermissionsUtil
 import com.radiantmood.calarm.MainViewModel
 import com.radiantmood.calarm.repo.CalendarRepository.UserCal
 import com.radiantmood.calarm.util.AppBarAction
@@ -28,7 +28,7 @@ import com.radiantmood.calarm.util.AppBarAction
 @Composable
 fun CalendarsActivityScreen() {
     val navController = AmbientNavController.current
-    AmbientPermissions.current.checkPermission(navController)
+    if (AmbientPermissionsUtil.current.checkPermissions(navController)) return
 
     val vm: MainViewModel = AmbientMainViewModel.current
     val calendars: List<CalendarDisplay> by vm.calendarDisplays.observeAsState(listOf())

@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.radiantmood.calarm.screen.AlarmsScreen
 import com.radiantmood.calarm.screen.CalendarsActivityScreen
+import com.radiantmood.calarm.screen.PermissionScreen
 
 
 @Composable

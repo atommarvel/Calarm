@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.radiantmood.calarm.util.PermissionsUtil
 
-val AmbientPermissions = ambientOf<PermissionsUtil> { error("No PermissionsKit") }
+val AmbientPermissionsUtil = ambientOf<PermissionsUtil> { error("No PermissionsKit") }
 val AmbientMainViewModel = ambientOf<MainViewModel> { error("No MainViewModel") }
 val AmbientNavController = ambientOf<NavHostController> { error("No NavController") }
 
@@ -18,7 +18,11 @@ fun App(activity: ComponentActivity) {
     val permissions = PermissionsUtil(activity)
     val vm: MainViewModel = viewModel()
     val navController = rememberNavController()
-    Providers(AmbientPermissions provides permissions, AmbientMainViewModel provides vm, AmbientNavController provides navController) {
+    Providers(
+        AmbientPermissionsUtil provides permissions,
+        AmbientMainViewModel provides vm,
+        AmbientNavController provides navController
+    ) {
         InitNavHost()
     }
 }
