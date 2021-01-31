@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.radiantmood.calarm.util.Fullscreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -17,6 +18,7 @@ import kotlinx.coroutines.withContext
 fun PermissionScreen() {
     val navController = AmbientNavController.current
     val permissions = AmbientPermissions.current
+
     Fullscreen {
         Text(text = "Calendar permission is required.")
         Spacer(modifier = Modifier.height(16.dp))

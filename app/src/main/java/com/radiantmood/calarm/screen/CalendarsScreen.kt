@@ -1,4 +1,4 @@
-package com.radiantmood.calarm
+package com.radiantmood.calarm.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -18,7 +18,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.radiantmood.calarm.CalendarRepository.UserCal
+import com.radiantmood.calarm.AmbientMainViewModel
+import com.radiantmood.calarm.AmbientNavController
+import com.radiantmood.calarm.AmbientPermissions
+import com.radiantmood.calarm.MainViewModel
+import com.radiantmood.calarm.repo.CalendarRepository.UserCal
+import com.radiantmood.calarm.util.AppBarAction
 
 @Composable
 fun CalendarsActivityScreen() {

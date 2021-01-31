@@ -1,14 +1,11 @@
 package com.radiantmood.calarm
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.radiantmood.calarm.util.render
 
 class MainActivity : AppCompatActivity() {
-
-    private val mainVM by viewModels<MainViewModel>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launchWhenResumed {
