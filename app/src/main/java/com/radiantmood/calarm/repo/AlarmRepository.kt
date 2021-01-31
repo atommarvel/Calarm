@@ -7,10 +7,14 @@ import java.util.concurrent.TimeUnit
 class AlarmRepository {
 
     @WorkerThread
-    suspend fun queryAlarms(): List<UserAlarm> = listOf(getOneMinDebugAlarm())
+    suspend fun queryAlarms(): List<UserAlarm> = listOf(getMinsDebugAlarm())
 
-    fun getOneMinDebugAlarm(future: Long = 1) = UserAlarm(Calendar.getInstance().apply {
+    fun getMinsDebugAlarm(future: Long = 1) = UserAlarm(Calendar.getInstance().apply {
         timeInMillis = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(future)
+    })
+
+    fun getSecondsDebugAlarm(future: Long = 20) = UserAlarm(Calendar.getInstance().apply {
+        timeInMillis = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(future)
     })
 
     data class UserAlarm(val calendar: Calendar)

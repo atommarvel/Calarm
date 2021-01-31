@@ -30,7 +30,7 @@ class MainViewModel : ViewModel() {
     private val alarmRepo = AlarmRepository()
     private val alarmUtil = AlarmUtil()
 
-    fun scheduleAlarm(alarm: UserAlarm = alarmRepo.getOneMinDebugAlarm()) {
+    fun scheduleAlarm(alarm: UserAlarm = alarmRepo.getSecondsDebugAlarm()) {
         alarmUtil.scheduleAlarm(alarm.calendar)
     }
 
