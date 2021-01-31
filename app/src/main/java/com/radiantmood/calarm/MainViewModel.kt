@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.radiantmood.calarm.repo.CalendarRepository
+import com.radiantmood.calarm.repo.EventRepository
 import com.radiantmood.calarm.repo.SelectedCalendarsRepository
 import com.radiantmood.calarm.screen.CalendarDisplay
 import com.radiantmood.calarm.screen.EventDisplay
@@ -20,10 +21,11 @@ class MainViewModel : ViewModel() {
 
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
     private val calendarRepo = CalendarRepository()
+    private val eventRepo = EventRepository()
 
     fun getEventDisplays() = viewModelScope.launch {
         val selectedIds = selectedCalendarsRepo.getAll()
-        val events = calendarRepo.queryEvents()
+        val events = eventRepo.queryEvents()
         val eventDisplays = events.filter { selectedIds.contains(it.calId) }.map { EventDisplay(it) }
         _eventDisplays.postValue(eventDisplays)
     }
