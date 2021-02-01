@@ -22,8 +22,8 @@ import com.radiantmood.calarm.AmbientMainViewModel
 import com.radiantmood.calarm.AmbientNavController
 import com.radiantmood.calarm.AmbientPermissionsUtil
 import com.radiantmood.calarm.R
-import com.radiantmood.calarm.repo.AlarmRepository.UserAlarm
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
+import com.radiantmood.calarm.repo.UserAlarm
 import com.radiantmood.calarm.util.AppBarAction
 import com.radiantmood.calarm.util.formatTime
 
@@ -38,6 +38,7 @@ fun AlarmsScreen() {
 
     Column {
         TopAppBar(title = { Text("Today's Alarms") }, actions = {
+            // TODO: add a quick way to get to calendar app
             AppBarAction(vectorResource(R.drawable.ic_baseline_calendar_today_24)) {
                 navController.navigate("calendars")
             }

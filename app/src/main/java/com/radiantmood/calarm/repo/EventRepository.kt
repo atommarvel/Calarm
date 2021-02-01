@@ -12,7 +12,7 @@ import java.util.*
 class EventRepository {
 
     @WorkerThread
-    suspend fun queryEvents(): List<CalEvent> = EventCursor().map { it }
+    suspend fun queryEvents(): List<CalEvent> = EventCursor().map { it }.sortedBy { it.start }
 
     /**
      * https://stackoverflow.com/questions/26844770/how-to-get-access-to-the-calendars-on-a-android-phone

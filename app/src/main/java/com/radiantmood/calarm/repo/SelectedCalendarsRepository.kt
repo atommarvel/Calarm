@@ -1,36 +1,39 @@
 package com.radiantmood.calarm.repo
 
-import android.content.Context
-import androidx.core.content.edit
-import com.radiantmood.calarm.calarm
+import androidx.room.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class SelectedCalendarsRepository {
 
-    private val ids: MutableSet<Int>
-    private val prefs = calarm.getSharedPreferences("SELECTED_CALENDARS_REPO", Context.MODE_PRIVATE)
-    private val key = "SELECTED_IDS"
-
-    init {
-        ids = prefs.getString(key, "")?.split(",")?.mapNotNull { it.toIntOrNull() }?.toMutableSet() ?: mutableSetOf()
-    }
+    private val dao = database.selectedCalDao()
 
     suspend fun add(calendarId: Int) = withContext(Dispatchers.Default) {
-        ids.add(calendarId)
-        updatePrefs()
+        dao.insertAll(SelectedCal(calendarId))
     }
 
     suspend fun remove(calendarId: Int) = withContext(Dispatchers.Default) {
-        ids.remove(calendarId)
-        updatePrefs()
+        dao.delete(SelectedCal(calendarId))
     }
 
     suspend fun getAll(): List<Int> = withContext(Dispatchers.Default) {
-        ids.toList()
+        dao.getAll().map { it.id }
     }
+}
 
-    private fun updatePrefs() = prefs.edit {
-        putString(key, ids.joinToString())
-    }
+@Entity
+data class SelectedCal(
+    @PrimaryKey val id: Int
+)
+
+@Dao
+interface SelectedCalDao {
+    @Query("SELECT * FROM SelectedCal")
+    suspend fun getAll(): List<SelectedCal>
+
+    @Insert
+    suspend fun insertAll(vararg selectedCals: SelectedCal)
+
+    @Delete
+    suspend fun delete(selectedCal: SelectedCal)
 }

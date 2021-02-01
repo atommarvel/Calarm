@@ -1,56 +1,54 @@
 package com.radiantmood.calarm.repo
 
-import android.content.Context
 import androidx.annotation.WorkerThread
-import androidx.core.content.edit
-import com.radiantmood.calarm.calarm
+import androidx.room.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class AlarmRepository {
 
-    // TODO: adopt Room
-    private val eventIdsToAlarms = mutableMapOf<Int, UserAlarm>()
-    private val prefs = calarm.getSharedPreferences("ALARMS_REPO", Context.MODE_PRIVATE)
-    private val key = "ALARM_"
-    private val keyCal = key + "CAL_"
-    private val keyIds = key + "IDS"
+    private val dao = database.alarmDao()
 
-    init {
-        prefs.getStringSet(keyIds, mutableSetOf())?.map { it.toInt() }?.forEach { id ->
-            val calendar = Calendar.getInstance().apply {
-                timeInMillis = prefs.getLong(keyCal + id, 0)
-            }
-            eventIdsToAlarms[id] = UserAlarm(id, calendar)
-        }
+    @WorkerThread
+    suspend fun queryAlarms(): List<UserAlarm> = withContext(Dispatchers.Default) {
+        dao.getAll()
     }
 
     @WorkerThread
-    suspend fun queryAlarms(): List<UserAlarm> = eventIdsToAlarms.values.toList()
-
-    @WorkerThread
-    suspend fun getForEvent(eventId: Int) = eventIdsToAlarms[eventId]
-
-    @WorkerThread
-    suspend fun add(alarm: UserAlarm) {
-        eventIdsToAlarms[alarm.eventId] = alarm
-        updatePrefs()
+    suspend fun getForEvent(eventId: Int) = withContext(Dispatchers.Default) {
+        dao.findByEventId(eventId)
     }
 
     @WorkerThread
-    suspend fun remove(eventId: Int) {
-        eventIdsToAlarms.remove(eventId)
-        updatePrefs()
+    suspend fun add(alarm: UserAlarm) = withContext(Dispatchers.Default) {
+        dao.insertAll(alarm)
     }
 
-    private fun updatePrefs() = prefs.edit {
-        clear()
-        val ids = mutableSetOf<String>()
-        eventIdsToAlarms.forEach { (id, alarm) ->
-            ids.add(id.toString())
-            putLong(keyCal + id, alarm.calendar.timeInMillis)
-        }
-        putStringSet(keyIds, ids)
+    @WorkerThread
+    suspend fun remove(eventId: Int) = withContext(Dispatchers.Default) {
+        dao.delete(getForEvent(eventId))
     }
-
-    data class UserAlarm(val eventId: Int, val calendar: Calendar)
 }
+
+@Entity
+data class UserAlarm(
+    @PrimaryKey val eventId: Int,
+    val calendar: Calendar
+)
+
+@Dao
+interface AlarmDao {
+    @Query("SELECT * FROM UserAlarm")
+    suspend fun getAll(): List<UserAlarm>
+
+    @Query("SELECT * FROM UserAlarm WHERE eventId LIKE :id LIMIT 1")
+    suspend fun findByEventId(id: Int): UserAlarm
+
+    @Insert
+    suspend fun insertAll(vararg alarms: UserAlarm)
+
+    @Delete
+    suspend fun delete(alarm: UserAlarm)
+}
+

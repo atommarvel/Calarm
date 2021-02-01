@@ -1,7 +1,7 @@
 package com.radiantmood.calarm.util
 
-import com.radiantmood.calarm.repo.AlarmRepository.UserAlarm
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
+import com.radiantmood.calarm.repo.UserAlarm
 import com.radiantmood.calarm.screen.EventDisplay
 
 fun getDebugEvent(): CalEvent {
