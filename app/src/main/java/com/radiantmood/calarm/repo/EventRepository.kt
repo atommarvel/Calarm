@@ -5,16 +5,14 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.CalendarContract
 import android.text.format.DateUtils
-import android.util.Log
 import androidx.annotation.WorkerThread
 import com.radiantmood.calarm.calarm
-import com.radiantmood.calarm.util.TAG
 import java.util.*
 
 class EventRepository {
 
     @WorkerThread
-    suspend fun queryEvents(): List<CalEvent> = EventCursor().map { it.also { Log.d(TAG, "queryEvents: $it") } }
+    suspend fun queryEvents(): List<CalEvent> = EventCursor().map { it }
 
     /**
      * https://stackoverflow.com/questions/26844770/how-to-get-access-to-the-calendars-on-a-android-phone
@@ -27,7 +25,8 @@ class EventRepository {
             CalendarContract.Events.CALENDAR_ID,
             CalendarContract.Events.TITLE,
             CalendarContract.Events.DTSTART,
-            CalendarContract.Events.DTEND
+            CalendarContract.Events.DTEND,
+            CalendarContract.Events._ID
         )
 
         init {
@@ -53,7 +52,7 @@ class EventRepository {
 
     }
 
-    data class CalEvent(val calId: Int, val title: String, val start: Calendar, val end: Calendar) {
+    data class CalEvent(val calId: Int, val eventId: Int, val title: String, val start: Calendar, val end: Calendar) {
         companion object {
             fun fromCursor(cursor: Cursor, position: Int): CalEvent {
                 cursor.moveToPosition(position)
@@ -63,7 +62,7 @@ class EventRepository {
                 val end = Calendar.getInstance().apply {
                     timeInMillis = cursor.getLong(3)
                 }
-                return CalEvent(cursor.getInt(0), cursor.getString(1).orEmpty(), start, end)
+                return CalEvent(cursor.getInt(0), cursor.getInt(4), cursor.getString(1).orEmpty(), start, end)
             }
         }
     }

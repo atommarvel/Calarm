@@ -1,6 +1,5 @@
 package com.radiantmood.calarm
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,11 +8,12 @@ import com.radiantmood.calarm.repo.AlarmRepository
 import com.radiantmood.calarm.repo.AlarmRepository.UserAlarm
 import com.radiantmood.calarm.repo.CalendarRepository
 import com.radiantmood.calarm.repo.EventRepository
+import com.radiantmood.calarm.repo.EventRepository.CalEvent
 import com.radiantmood.calarm.repo.SelectedCalendarsRepository
 import com.radiantmood.calarm.screen.CalendarDisplay
 import com.radiantmood.calarm.screen.EventDisplay
 import com.radiantmood.calarm.util.AlarmUtil
-import com.radiantmood.calarm.util.TAG
+import com.radiantmood.calarm.util.getDebugEventDisplay
 import kotlinx.coroutines.launch
 
 // TODO: move up to being created at App() level
@@ -30,16 +30,38 @@ class MainViewModel : ViewModel() {
     private val alarmRepo = AlarmRepository()
     private val alarmUtil = AlarmUtil()
 
-    fun scheduleAlarm(alarm: UserAlarm = alarmRepo.getSecondsDebugAlarm()) {
-        alarmUtil.scheduleAlarm(alarm.calendar)
+    fun toggleAlarm(event: CalEvent) = viewModelScope.launch {
+        val alarm = alarmRepo.getForEvent(event.eventId)
+        if (alarm != null) {
+            cancelAlarm(alarm)
+        } else scheduleAlarm(event)
+    }
+
+    fun scheduleAlarm(event: CalEvent) = viewModelScope.launch {
+        val alarm = UserAlarm(event.eventId, event.start)
+        alarmRepo.add(alarm)
+        alarmUtil.scheduleAlarm(alarm.calendar, alarm.eventId)
+        getEventDisplays()
+    }
+
+    fun cancelAlarm(alarm: UserAlarm) = viewModelScope.launch {
+        alarmRepo.remove(alarm.eventId)
+        alarmUtil.cancelAlarm(alarm.eventId)
+        getEventDisplays()
     }
 
     fun getEventDisplays() = viewModelScope.launch {
         val selectedIds = selectedCalendarsRepo.getAll()
         val events = eventRepo.queryEvents()
-        val alarms = alarmRepo.queryAlarms()
-        Log.d(TAG, "getEventDisplays: $alarms")
-        val eventDisplays = events.filter { selectedIds.contains(it.calId) }.map { EventDisplay(it) }
+        val eventDisplays = events.filter { selectedIds.contains(it.calId) }.map {
+            val alarm = alarmRepo.getForEvent(it.eventId)
+            EventDisplay(it, alarm)
+        }.toMutableList()
+
+        val debugAlarm = alarmRepo.getForEvent(-1)
+        val withDebug = getDebugEventDisplay(debugAlarm)
+        eventDisplays.add(0, withDebug)
+
         _eventDisplays.postValue(eventDisplays)
     }
 

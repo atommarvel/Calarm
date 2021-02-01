@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -22,6 +22,7 @@ import com.radiantmood.calarm.AmbientMainViewModel
 import com.radiantmood.calarm.AmbientNavController
 import com.radiantmood.calarm.AmbientPermissionsUtil
 import com.radiantmood.calarm.R
+import com.radiantmood.calarm.repo.AlarmRepository.UserAlarm
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
 import com.radiantmood.calarm.util.AppBarAction
 import com.radiantmood.calarm.util.formatTime
@@ -41,12 +42,9 @@ fun AlarmsScreen() {
                 navController.navigate("calendars")
             }
         })
-        Button(onClick = { vm.scheduleAlarm() }) {
-            Text("Schedule Alarm")
-        }
         LazyColumn {
             items(events) { event ->
-                EventRow(event)
+                EventRow(event = event, toggleAlarm = vm::toggleAlarm)
             }
         }
         // TODO: Loading
@@ -54,17 +52,23 @@ fun AlarmsScreen() {
 }
 
 @Composable
-fun EventRow(event: EventDisplay) {
+fun EventRow(event: EventDisplay, toggleAlarm: (CalEvent) -> Unit) {
     Row(
         modifier = Modifier
-            .clickable(onClick = { /*TODO*/ })
+            .clickable(onClick = { toggleAlarm(event.calEvent) })
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        val startTime = event.calEvent.start.formatTime()
-        val endTime = event.calEvent.end.formatTime()
-        Text("\"${event.calEvent.title}\": $startTime - $endTime")
+        EventLabel(event, Modifier.weight(1f))
+        Switch(checked = event.userAlarm != null, onCheckedChange = { toggleAlarm(event.calEvent) })
     }
 }
 
-data class EventDisplay(val calEvent: CalEvent)
+@Composable
+fun EventLabel(event: EventDisplay, modifier: Modifier) {
+    val startTime = event.calEvent.start.formatTime()
+    val endTime = event.calEvent.end.formatTime()
+    Text("\"${event.calEvent.title}\": $startTime - $endTime", modifier = modifier)
+}
+
+data class EventDisplay(val calEvent: CalEvent, val userAlarm: UserAlarm?)

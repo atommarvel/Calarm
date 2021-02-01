@@ -14,14 +14,28 @@ class AlarmUtil {
 
     private val am: AlarmManager by lazy { calarm.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
 
-    fun scheduleAlarm(calendar: Calendar) {
-        val intent = Intent(calarm, AlarmExperienceActivity::class.java)
-        intent.putExtra("isAlarm", true)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        val pIntentFlags = Intent.FLAG_ACTIVITY_NEW_TASK or PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        val pIntent = PendingIntent.getActivity(calarm, 101, intent, pIntentFlags)
+    fun scheduleAlarm(calendar: Calendar, eventId: Int) {
+        val pIntent = createPendingIntent(eventId)
         val info = AlarmManager.AlarmClockInfo(calendar.timeInMillis, pIntent)
         am.setAlarmClock(info, pIntent)
         Toast.makeText(calarm, "Alarm set for ${calendar.formatTime()}", Toast.LENGTH_SHORT).show()
     }
+
+    fun cancelAlarm(eventId: Int) {
+        val pIntent = createPendingIntent(eventId)
+        am.cancel(pIntent)
+    }
+
+    private fun createPendingIntent(eventId: Int): PendingIntent {
+        val intent = Intent(calarm, AlarmExperienceActivity::class.java).apply {
+            putExtra("isAlarm", true)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val pIntentFlags = Intent.FLAG_ACTIVITY_NEW_TASK or PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        return PendingIntent.getActivity(calarm, eventId, intent, pIntentFlags)
+    }
+
+    // TODO: a simple way to cancel all scheduled alarms registered to AlarmManager
+
+    // TODO: reconcile all alarms to their events to make sure there are no unmatched alarms due to event changes
 }
