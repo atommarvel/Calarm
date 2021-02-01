@@ -12,7 +12,6 @@ import com.radiantmood.calarm.util.AlarmUtil
 import com.radiantmood.calarm.util.getDebugEventDisplay
 import kotlinx.coroutines.launch
 
-// TODO: move up to being created at App() level
 class MainViewModel : ViewModel() {
     private var _calendarDisplays = MutableLiveData(listOf<CalendarDisplay>())
     val calendarDisplays: LiveData<List<CalendarDisplay>> = _calendarDisplays

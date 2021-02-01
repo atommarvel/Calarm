@@ -27,7 +27,7 @@ class AlarmRepository {
 
     @WorkerThread
     suspend fun remove(eventId: Int) = withContext(Dispatchers.Default) {
-        dao.delete(getForEvent(eventId))
+        getForEvent(eventId)?.let { dao.delete(it) }
     }
 }
 
@@ -43,7 +43,7 @@ interface AlarmDao {
     suspend fun getAll(): List<UserAlarm>
 
     @Query("SELECT * FROM UserAlarm WHERE eventId LIKE :id LIMIT 1")
-    suspend fun findByEventId(id: Int): UserAlarm
+    suspend fun findByEventId(id: Int): UserAlarm?
 
     @Insert
     suspend fun insertAll(vararg alarms: UserAlarm)

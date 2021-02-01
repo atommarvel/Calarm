@@ -38,4 +38,5 @@ class AlarmUtil {
     // TODO: a simple way to cancel all scheduled alarms registered to AlarmManager
 
     // TODO: reconcile all alarms to their events to make sure there are no unmatched alarms due to event changes
+    // is there a way to listen for updates in calendar events? sync adapters?
 }

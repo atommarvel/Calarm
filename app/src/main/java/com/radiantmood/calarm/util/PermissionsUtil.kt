@@ -28,10 +28,10 @@ class PermissionsUtil(private val activity: Activity) {
 
     fun arePermissionsGranted(): Boolean = isCalendarPermissionGranted() && isOverlayPermissionGranted()
 
-    private fun isCalendarPermissionGranted(): Boolean =
+    fun isCalendarPermissionGranted(): Boolean =
         ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED
 
-    private fun isOverlayPermissionGranted(): Boolean = Settings.canDrawOverlays(activity)
+    fun isOverlayPermissionGranted(): Boolean = Settings.canDrawOverlays(activity)
 
     fun checkPermissions(navController: NavController): Boolean = if (!arePermissionsGranted()) {
         navController.navigate("permission")

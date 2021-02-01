@@ -48,7 +48,7 @@ fun AlarmsScreen() {
                 EventRow(event = event, toggleAlarm = vm::toggleAlarm)
             }
         }
-        // TODO: Loading
+        // TODO: Loading UI
     }
 }
 

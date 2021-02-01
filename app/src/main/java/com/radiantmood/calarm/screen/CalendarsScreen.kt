@@ -37,8 +37,6 @@ fun CalendarsActivityScreen() {
     Column {
         TopAppBar(title = { Text("Select Calendars to use") }, actions = {
             AppBarAction(Icons.Default.Check) {
-                // val selectedCalendars = calendarList.filter { selectedIds.contains(it.id) }
-                // TODO: save calendar selection to a repository of some sort
                 navController.popBackStack()
             }
         })
