@@ -16,6 +16,8 @@ class CalendarRepository {
     class CalendarCursor : Iterable<UserCal> {
 
         val cursor: Cursor
+
+        // TODO: get calendar color
         private val projection = arrayOf(Calendars._ID, Calendars.CALENDAR_DISPLAY_NAME)
 
         init {

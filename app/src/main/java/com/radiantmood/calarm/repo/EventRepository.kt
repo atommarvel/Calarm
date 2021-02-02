@@ -20,6 +20,8 @@ class EventRepository {
     class EventCursor : Iterable<CalEvent> {
 
         val cursor: Cursor
+
+        // TODO: get calendar color
         private val projection: Array<String> = arrayOf(
             CalendarContract.Events.CALENDAR_ID,
             CalendarContract.Events.TITLE,
