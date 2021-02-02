@@ -9,6 +9,7 @@ import com.radiantmood.calarm.repo.EventRepository.CalEvent
 import com.radiantmood.calarm.screen.CalendarDisplay
 import com.radiantmood.calarm.screen.EventDisplay
 import com.radiantmood.calarm.util.AlarmUtil
+import com.radiantmood.calarm.util.getDebugEventDisplay
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -34,15 +35,15 @@ class MainViewModel : ViewModel() {
     }
 
     fun scheduleAlarm(event: CalEvent) = viewModelScope.launch {
-        val alarm = UserAlarm(event.eventId, event.start)
+        val alarm = UserAlarm(event.eventId, event.start, event.title)
         alarmRepo.add(alarm)
-        alarmUtil.scheduleAlarm(alarm.calendar, alarm.eventId)
+        alarmUtil.scheduleAlarm(alarm)
         getEventDisplays()
     }
 
     fun cancelAlarm(alarm: UserAlarm) = viewModelScope.launch {
         alarmRepo.remove(alarm.eventId)
-        alarmUtil.cancelAlarm(alarm.eventId)
+        alarmUtil.cancelAlarm(alarm)
         getEventDisplays()
     }
 
@@ -54,9 +55,9 @@ class MainViewModel : ViewModel() {
             EventDisplay(it, alarm)
         }.toMutableList()
 
-//        val debugAlarm = alarmRepo.getForEvent(-1)
-//        val withDebug = getDebugEventDisplay(debugAlarm)
-//        eventDisplays.add(0, withDebug)
+        val debugAlarm = alarmRepo.getForEvent(-1)
+        val withDebug = getDebugEventDisplay(debugAlarm)
+        eventDisplays.add(0, withDebug)
 
         _eventDisplays.postValue(eventDisplays)
     }

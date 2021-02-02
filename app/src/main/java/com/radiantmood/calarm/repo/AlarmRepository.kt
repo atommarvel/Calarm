@@ -34,7 +34,8 @@ class AlarmRepository {
 @Entity
 data class UserAlarm(
     @PrimaryKey val eventId: Int,
-    val calendar: Calendar
+    val calendar: Calendar,
+    val title: String
 )
 
 @Dao

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -24,10 +25,7 @@ import com.radiantmood.calarm.AmbientPermissionsUtil
 import com.radiantmood.calarm.R
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
 import com.radiantmood.calarm.repo.UserAlarm
-import com.radiantmood.calarm.util.AppBarAction
-import com.radiantmood.calarm.util.Fullscreen
-import com.radiantmood.calarm.util.LoadingScreen
-import com.radiantmood.calarm.util.formatTime
+import com.radiantmood.calarm.util.*
 
 @Composable
 fun AlarmsScreen() {
@@ -39,12 +37,17 @@ fun AlarmsScreen() {
     vm.getEventDisplays()
 
     Column {
+        // TODO: Strings -> resource ids
+        // TODO: Scaffold
         TopAppBar(title = { Text("Today's Alarms") }, actions = {
             // TODO: add a quick way to get to calendar app
             AppBarAction(vectorResource(R.drawable.ic_baseline_calendar_today_24)) {
                 navController.navigate("calendars")
             }
         })
+        Button({ vm.scheduleAlarm(getDebugEvent(getFutureCalendar(secondsInFuture = 10))) }) {
+            Text("Schedule alarm 20 seconds from now")
+        }
         val eventList = events // not the same as events since events is backed by a delegate
         if (eventList != null) {
             if (eventList.isEmpty()) {
