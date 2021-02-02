@@ -25,6 +25,8 @@ import com.radiantmood.calarm.R
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
 import com.radiantmood.calarm.repo.UserAlarm
 import com.radiantmood.calarm.util.AppBarAction
+import com.radiantmood.calarm.util.Fullscreen
+import com.radiantmood.calarm.util.LoadingScreen
 import com.radiantmood.calarm.util.formatTime
 
 @Composable
@@ -33,7 +35,7 @@ fun AlarmsScreen() {
     if (AmbientPermissionsUtil.current.checkPermissions(navController)) return
 
     val vm = AmbientMainViewModel.current
-    val events: List<EventDisplay> by vm.eventDisplays.observeAsState(listOf())
+    val events: List<EventDisplay>? by vm.eventDisplays.observeAsState(null)
     vm.getEventDisplays()
 
     Column {
@@ -43,12 +45,30 @@ fun AlarmsScreen() {
                 navController.navigate("calendars")
             }
         })
-        LazyColumn {
-            items(events) { event ->
-                EventRow(event = event, toggleAlarm = vm::toggleAlarm)
+        val eventList = events // not the same as events since events is backed by a delegate
+        if (eventList != null) {
+            if (eventList.isEmpty()) {
+                NoEventsScreen()
+            } else {
+                EventsList(eventList = eventList, toggleAlarm = vm::toggleAlarm)
             }
+        } else {
+            LoadingScreen()
         }
-        // TODO: Loading UI
+    }
+}
+
+@Composable
+fun NoEventsScreen() = Fullscreen {
+    Text("No more events today!")
+}
+
+@Composable
+fun EventsList(eventList: List<EventDisplay>, toggleAlarm: (CalEvent) -> Unit) {
+    LazyColumn {
+        items(eventList) { event ->
+            EventRow(event = event, toggleAlarm = toggleAlarm)
+        }
     }
 }
 
