@@ -9,7 +9,6 @@ import com.radiantmood.calarm.repo.EventRepository.CalEvent
 import com.radiantmood.calarm.screen.CalendarDisplay
 import com.radiantmood.calarm.screen.EventDisplay
 import com.radiantmood.calarm.util.AlarmUtil
-import com.radiantmood.calarm.util.getDebugEventDisplay
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -22,6 +21,8 @@ class MainViewModel : ViewModel() {
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
     private val calendarRepo = CalendarRepository()
     private val eventRepo = EventRepository()
+
+    // TODO: group alarm classes into a manager
     private val alarmRepo = AlarmRepository()
     private val alarmUtil = AlarmUtil()
 
@@ -53,9 +54,9 @@ class MainViewModel : ViewModel() {
             EventDisplay(it, alarm)
         }.toMutableList()
 
-        val debugAlarm = alarmRepo.getForEvent(-1)
-        val withDebug = getDebugEventDisplay(debugAlarm)
-        eventDisplays.add(0, withDebug)
+//        val debugAlarm = alarmRepo.getForEvent(-1)
+//        val withDebug = getDebugEventDisplay(debugAlarm)
+//        eventDisplays.add(0, withDebug)
 
         _eventDisplays.postValue(eventDisplays)
     }
