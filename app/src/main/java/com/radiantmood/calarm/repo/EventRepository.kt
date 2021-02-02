@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.database.Cursor
 import android.net.Uri
 import android.provider.CalendarContract
-import android.text.format.DateUtils
 import androidx.annotation.WorkerThread
 import com.radiantmood.calarm.calarm
 import java.util.*
@@ -33,7 +32,15 @@ class EventRepository {
             val builder: Uri.Builder = CalendarContract.Events.CONTENT_URI.buildUpon()
 
             val start = System.currentTimeMillis()
-            val end = start + DateUtils.DAY_IN_MILLIS
+            val end = Calendar.getInstance().apply {
+                timeInMillis = start
+                set(Calendar.HOUR_OF_DAY, 23)
+                set(Calendar.MINUTE, 59)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+                set(Calendar.HOUR, 11)
+                set(Calendar.AM_PM, 1)
+            }.timeInMillis
             // TODO: only query for selected calendars
             val contentResolver: ContentResolver = calarm.contentResolver
             val selection = "(( ${CalendarContract.Events.DTSTART} >= $start ) AND ( ${CalendarContract.Events.DTSTART} <= $end ))"
