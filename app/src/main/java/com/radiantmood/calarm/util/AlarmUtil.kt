@@ -9,6 +9,8 @@ import com.radiantmood.calarm.AlarmExperienceActivity
 import com.radiantmood.calarm.calarm
 import com.radiantmood.calarm.repo.UserAlarm
 import java.io.Serializable
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class AlarmUtil {
@@ -16,10 +18,13 @@ class AlarmUtil {
     private val am: AlarmManager by lazy { calarm.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
 
     fun scheduleAlarm(userAlarm: UserAlarm) {
+        val time = Calendar.getInstance().apply {
+            timeInMillis = userAlarm.calendar.timeInMillis + TimeUnit.MINUTES.toMillis(userAlarm.offsetMin.toLong())
+        }
         val pIntent = createPendingIntent(userAlarm)
-        val info = AlarmManager.AlarmClockInfo(userAlarm.calendar.timeInMillis, pIntent)
+        val info = AlarmManager.AlarmClockInfo(time.timeInMillis, pIntent)
         am.setAlarmClock(info, pIntent)
-        Toast.makeText(calarm, "Alarm set for ${userAlarm.calendar.formatTime()}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(calarm, "Alarm set for ${time.formatTime()}", Toast.LENGTH_SHORT).show()
     }
 
     fun cancelAlarm(userAlarm: UserAlarm) {

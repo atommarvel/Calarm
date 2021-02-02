@@ -35,7 +35,8 @@ class AlarmRepository {
 data class UserAlarm(
     @PrimaryKey val eventId: Int,
     val calendar: Calendar,
-    val title: String
+    val title: String,
+    val offsetMin: Int = 0
 )
 
 @Dao
@@ -46,7 +47,7 @@ interface AlarmDao {
     @Query("SELECT * FROM UserAlarm WHERE eventId LIKE :id LIMIT 1")
     suspend fun findByEventId(id: Int): UserAlarm?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(vararg alarms: UserAlarm)
 
     @Delete

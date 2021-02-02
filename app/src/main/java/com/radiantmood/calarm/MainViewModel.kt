@@ -11,6 +11,7 @@ import com.radiantmood.calarm.screen.EventDisplay
 import com.radiantmood.calarm.util.AlarmUtil
 import com.radiantmood.calarm.util.getDebugEventDisplay
 import kotlinx.coroutines.launch
+import java.util.*
 
 class MainViewModel : ViewModel() {
     private var _calendarDisplays = MutableLiveData(listOf<CalendarDisplay>())
@@ -31,11 +32,19 @@ class MainViewModel : ViewModel() {
         val alarm = alarmRepo.getForEvent(event.eventId)
         if (alarm != null) {
             cancelAlarm(alarm)
-        } else scheduleAlarm(event)
+        } else scheduleAlarm(event.eventId, event.start, event.title)
     }
 
-    fun scheduleAlarm(event: CalEvent) = viewModelScope.launch {
-        val alarm = UserAlarm(event.eventId, event.start, event.title)
+    fun setAlarmOffset(eventId: Int, offset: Int) = viewModelScope.launch {
+        val alarm = alarmRepo.getForEvent(eventId)
+        if (alarm != null) {
+            alarmUtil.cancelAlarm(alarm)
+            scheduleAlarm(alarm.eventId, alarm.calendar, alarm.title, offset)
+        }
+    }
+
+    fun scheduleAlarm(eventId: Int, start: Calendar, title: String, offset: Int = 0) = viewModelScope.launch {
+        val alarm = UserAlarm(eventId, start, title, offset)
         alarmRepo.add(alarm)
         alarmUtil.scheduleAlarm(alarm)
         getEventDisplays()
