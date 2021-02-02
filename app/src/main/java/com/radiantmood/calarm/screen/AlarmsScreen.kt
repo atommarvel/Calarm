@@ -70,21 +70,22 @@ fun NoEventsScreen() = Fullscreen {
 fun EventsList(eventList: List<EventDisplay>, toggleAlarm: (CalEvent) -> Unit) {
     LazyColumn {
         items(eventList) { event ->
-            EventRow(event = event, toggleAlarm = toggleAlarm)
+            EventRow(event = event) { toggleAlarm(event.calEvent) }
         }
     }
 }
 
 @Composable
-fun EventRow(event: EventDisplay, toggleAlarm: (CalEvent) -> Unit) {
+fun EventRow(event: EventDisplay, toggleAlarm: () -> Unit) {
     Row(
         modifier = Modifier
-            .clickable(onClick = { toggleAlarm(event.calEvent) })
+            .clickable(onClick = toggleAlarm)
             .fillMaxWidth()
             .padding(16.dp)
     ) {
+        // TODO: make prettier
         EventLabel(event, Modifier.weight(1f))
-        Switch(checked = event.userAlarm != null, onCheckedChange = { toggleAlarm(event.calEvent) })
+        Switch(checked = event.userAlarm != null, onCheckedChange = { toggleAlarm() })
     }
 }
 

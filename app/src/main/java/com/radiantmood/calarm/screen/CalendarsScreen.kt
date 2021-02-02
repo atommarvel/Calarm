@@ -22,6 +22,7 @@ import com.radiantmood.calarm.AmbientMainViewModel
 import com.radiantmood.calarm.AmbientNavController
 import com.radiantmood.calarm.AmbientPermissionsUtil
 import com.radiantmood.calarm.MainViewModel
+import com.radiantmood.calarm.repo.CalendarRepository.ICal
 import com.radiantmood.calarm.repo.CalendarRepository.UserCal
 import com.radiantmood.calarm.util.AppBarAction
 
@@ -41,35 +42,33 @@ fun CalendarsActivityScreen() {
             }
         })
         CalendarList(calendars) {
-            vm.toggleSelectedCalendarId(it.userCal.id)
+            vm.toggleSelectedCalendarId(it.id)
         }
     }
 }
 
-data class CalendarDisplay(val userCal: UserCal, val isSelected: Boolean)
+data class CalendarDisplay(private val userCal: UserCal, val isSelected: Boolean) : ICal by userCal
 
 @Composable
 fun CalendarList(calendars: List<CalendarDisplay>, selectCalendar: (CalendarDisplay) -> Unit) {
     // TODO: loading view while waiting?
     LazyColumn {
         items(calendars) { calendar ->
-            CalendarRow(calendar, selectCalendar)
+            CalendarRow(calendar) { selectCalendar(calendar) }
             Divider()
         }
     }
 }
 
 @Composable
-fun CalendarRow(calendar: CalendarDisplay, selectCalendar: (CalendarDisplay) -> Unit) {
+fun CalendarRow(calendar: CalendarDisplay, selectCalendar: () -> Unit) {
     Row(
         modifier = Modifier
-            .clickable(onClick = { selectCalendar(calendar) })
+            .clickable(onClick = selectCalendar)
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(text = calendar.userCal.name, Modifier.weight(1f))
-        Switch(checked = calendar.isSelected, onCheckedChange = {
-            selectCalendar(calendar)
-        })
+        Text(text = calendar.name, Modifier.weight(1f))
+        Switch(checked = calendar.isSelected, onCheckedChange = { selectCalendar() })
     }
 }

@@ -36,7 +36,12 @@ class CalendarRepository {
         }
     }
 
-    data class UserCal(val id: Int, val name: String) {
+    interface ICal {
+        val id: Int
+        val name: String
+    }
+
+    data class UserCal(override val id: Int, override val name: String) : ICal {
         companion object {
             fun fromCursor(cursor: Cursor, position: Int): UserCal {
                 cursor.moveToPosition(position)
