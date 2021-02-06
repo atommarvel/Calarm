@@ -1,6 +1,7 @@
 package com.radiantmood.calarm.repo
 
 import android.content.ContentResolver
+import android.content.ContentUris
 import android.database.Cursor
 import android.net.Uri
 import android.provider.CalendarContract
@@ -10,10 +11,13 @@ import java.util.*
 
 class EventRepository {
 
+    // TODO: why is this getting called a ton?
     @WorkerThread
     suspend fun queryEvents(): List<CalEvent> = EventCursor().map { it }.sortedBy { it.start }
 
     /**
+     * https://github.com/mtrung/android-WatchFace/blob/feature/wearable_calendar/Wearable/src/main/java/com/example/android/wearable/watchface/calendar/CalendarEvent.java
+     *
      * https://stackoverflow.com/questions/26844770/how-to-get-access-to-the-calendars-on-a-android-phone
      * https://github.com/CyanogenMod/android_packages_apps_Calendar/blob/cm-12.0/src/com/android/calendar/Event.java#L307
      */
@@ -23,15 +27,15 @@ class EventRepository {
 
         // TODO: get calendar color
         private val projection: Array<String> = arrayOf(
-            CalendarContract.Events.CALENDAR_ID,
-            CalendarContract.Events.TITLE,
-            CalendarContract.Events.DTSTART,
-            CalendarContract.Events.DTEND,
-            CalendarContract.Events._ID
+            CalendarContract.Instances.CALENDAR_ID,
+            CalendarContract.Instances.TITLE,
+            CalendarContract.Instances.BEGIN,
+            CalendarContract.Instances.END,
+            CalendarContract.Instances._ID
         )
 
         init {
-            val builder: Uri.Builder = CalendarContract.Events.CONTENT_URI.buildUpon()
+            val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
 
             val start = System.currentTimeMillis()
             val end = Calendar.getInstance().apply {
@@ -43,11 +47,13 @@ class EventRepository {
                 set(Calendar.HOUR, 11)
                 set(Calendar.AM_PM, 1)
             }.timeInMillis
+
+            ContentUris.appendId(builder, start)
+            ContentUris.appendId(builder, end)
             // TODO: only query for selected calendars
             val contentResolver: ContentResolver = calarm.contentResolver
-            val selection = "(( ${CalendarContract.Events.DTSTART} >= $start ) AND ( ${CalendarContract.Events.DTSTART} <= $end ))"
             // TODO: sort order
-            cursor = checkNotNull(contentResolver.query(builder.build(), projection, selection, null, null))
+            cursor = checkNotNull(contentResolver.query(builder.build(), projection, null, null, null))
         }
 
         override fun iterator(): Iterator<CalEvent> = object : Iterator<CalEvent> {
