@@ -32,7 +32,6 @@ fun CalendarsActivityScreen() {
     if (AmbientPermissionsUtil.current.checkPermissions(navController)) return
 
     val vm: MainViewModel = AmbientMainViewModel.current
-    val screenModel: CalendarScreenModel by vm.calendarScreen.observeAsState(CalendarScreenModel.getEmpty())
     vm.getCalendarDisplays() // Where should this ACTUALLY be called?
 
     Column {
@@ -42,10 +41,18 @@ fun CalendarsActivityScreen() {
             }
         })
         // TODO: a filter to only show selected calendars
-        when(screenModel.state) {
-            is LoadingState -> LoadingScreen()
-            else -> CalendarList(screenModel.calendarSelectionModels)
-        }
+        CalendarScreenContent()
+    }
+}
+
+@Composable
+fun CalendarScreenContent() {
+    val vm: MainViewModel = AmbientMainViewModel.current
+    val screenModel: CalendarScreenModel by vm.calendarScreen.observeAsState(CalendarScreenModel.getEmpty())
+
+    when(screenModel.state) {
+        is LoadingState -> LoadingScreen()
+        else -> CalendarList(screenModel.calendarSelectionModels)
     }
 }
 
