@@ -1,7 +1,5 @@
 package com.radiantmood.calarm
 
-import android.text.format.DateUtils
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,13 +11,10 @@ import com.radiantmood.calarm.screen.FinishedState
 import com.radiantmood.calarm.screen.calendars.CalendarScreenModel
 import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
 import com.radiantmood.calarm.util.AlarmUtil
-import com.radiantmood.calarm.util.TAG
 import com.radiantmood.calarm.util.bind
 import com.radiantmood.calarm.util.getDebugEventDisplay
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class MainViewModel : ViewModel() {
     private var _calendarScreen = MutableLiveData(CalendarScreenModel.getEmpty())
