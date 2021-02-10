@@ -1,4 +1,4 @@
-package com.radiantmood.calarm.screen
+package com.radiantmood.calarm.screen.events
 
 
 import androidx.compose.foundation.layout.Column
@@ -24,17 +24,16 @@ import com.radiantmood.calarm.AmbientMainViewModel
 import com.radiantmood.calarm.AmbientNavController
 import com.radiantmood.calarm.AmbientPermissionsUtil
 import com.radiantmood.calarm.R
-import com.radiantmood.calarm.repo.EventRepository.CalEvent
-import com.radiantmood.calarm.repo.UserAlarm
+import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.*
 
 @Composable
-fun AlarmsScreen() {
+fun EventsScreen() {
     val navController = AmbientNavController.current
     if (AmbientPermissionsUtil.current.checkPermissions(navController)) return
 
     val vm = AmbientMainViewModel.current
-    val events: List<EventDisplay>? by vm.eventDisplays.observeAsState(null)
+    val screenModel: EventsScreenModel by vm.eventsScreen.observeAsState(EventsScreenModel.getEmpty())
     vm.getEventDisplays()
 
     Column {
@@ -42,26 +41,34 @@ fun AlarmsScreen() {
         // TODO: Scaffold
         TopAppBar(title = { Text("Today's Alarms") }, actions = {
             // TODO: add a quick way to get to calendar app
+            // TODO: add a quick way to create an invisible event for 11:59 pm for testing
+            // TODO: enable/disable debug calendar event
             AppBarAction(vectorResource(R.drawable.ic_baseline_calendar_today_24)) {
                 navController.navigate("calendars")
             }
         })
-        Button({
-            val event = getDebugEvent(getFutureCalendar(secondsInFuture = 10))
-            vm.scheduleAlarm(event.eventId, event.start, event.title)
-        }) {
-            Text("Schedule alarm 20 seconds from now")
-        }
-        val eventList = events // not the same as events since events is backed by a delegate
-        if (eventList != null) {
-            if (eventList.isEmpty()) {
-                NoEventsScreen()
-            } else {
-                EventsList(eventList = eventList, toggleAlarm = vm::toggleAlarm, vm::setAlarmOffset)
-            }
-        } else {
-            LoadingScreen()
-        }
+        DebugAlarmButton()
+        EventsContent(screenModel)
+    }
+}
+
+@Composable
+fun DebugAlarmButton() {
+    val vm = AmbientMainViewModel.current
+    Button({
+        val event = getDebugEvent(getFutureCalendar(secondsInFuture = 10))
+        vm.scheduleAlarm(event.eventId, event.start, event.title)
+    }) {
+        Text("Schedule alarm 20 seconds from now")
+    }
+}
+
+@Composable
+fun EventsContent(screenModel: EventsScreenModel) {
+    when {
+        screenModel.state is LoadingState -> LoadingScreen()
+        screenModel.eventModels.isEmpty() -> NoEventsScreen()
+        else -> EventsList(screenModel.eventModels)
     }
 }
 
@@ -71,18 +78,17 @@ fun NoEventsScreen() = Fullscreen {
 }
 
 @Composable
-fun EventsList(eventList: List<EventDisplay>, toggleAlarm: (CalEvent) -> Unit, setAlarmOffset: (Int, Int) -> Unit) {
+fun EventsList(eventList: List<EventModel>) {
     LazyColumn {
         items(eventList) { event ->
-            EventRow(event = event, { toggleAlarm(event.calEvent) }, { setAlarmOffset(event.calEvent.eventId, it) })
+            EventRow(event)
             Divider()
         }
     }
 }
 
 @Composable
-fun EventRow(event: EventDisplay, toggleAlarm: () -> Unit, setAlarmOffset: (Int) -> Unit) {
-    val offset = event.userAlarm?.offsetMin ?: 0
+fun EventRow(event: EventModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -90,37 +96,23 @@ fun EventRow(event: EventDisplay, toggleAlarm: () -> Unit, setAlarmOffset: (Int)
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(event.calEvent.title, fontSize = 18.sp)
-            TimeLabel(event)
+            Text(event.eventName, fontSize = 18.sp)
+            Text(event.timeRange)
         }
-        if (event.userAlarm != null) {
-            OffsetView(
-                "Offset: $offset",
-                Modifier.weight(1f),
-                { setAlarmOffset(offset + 1) },
-                { setAlarmOffset(offset - 1) }
-            )
+        if (event.isAlarmSet) {
+            OffsetView(Modifier.weight(1f), event)
         }
-        Switch(checked = event.userAlarm != null, onCheckedChange = { toggleAlarm() })
+        Switch(checked = event.isAlarmSet, onCheckedChange = { event.onToggleAlarm() })
     }
 }
 
 @Composable
-fun OffsetView(text: String, modifier: Modifier = Modifier, onIncrement: () -> Unit, onDecrement: () -> Unit) {
+fun OffsetView(modifier: Modifier = Modifier, event: EventModel) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text)
+        Text("Offset: ${event.alarmOffset}")
         Row {
-            AppBarAction(Icons.Default.ArrowDownward, onDecrement)
-            AppBarAction(Icons.Default.ArrowUpward, onIncrement)
+            AppBarAction(Icons.Default.ArrowDownward, event.onDecreaseOffset)
+            AppBarAction(Icons.Default.ArrowUpward, event.onIncreaseOffset)
         }
     }
 }
-
-@Composable
-fun TimeLabel(event: EventDisplay) {
-    val startTime = event.calEvent.start.formatTime()
-    val endTime = event.calEvent.end.formatTime()
-    Text("$startTime - $endTime")
-}
-
-data class EventDisplay(val calEvent: CalEvent, val userAlarm: UserAlarm?)

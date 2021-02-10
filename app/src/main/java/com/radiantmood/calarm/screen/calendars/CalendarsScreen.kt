@@ -48,9 +48,9 @@ fun CalendarsActivityScreen() {
 @Composable
 fun CalendarScreenContent() {
     val vm: MainViewModel = AmbientMainViewModel.current
-    val screenModel: CalendarScreenModel by vm.calendarScreen.observeAsState(CalendarScreenModel.getEmpty())
+    val screenModel: CalendarScreenModel by vm.calendarsScreen.observeAsState(CalendarScreenModel.getEmpty())
 
-    when(screenModel.state) {
+    when (screenModel.state) {
         is LoadingState -> LoadingScreen()
         else -> CalendarList(screenModel.calendarSelectionModels)
     }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.ambientOf
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.radiantmood.calarm.util.InitNavHost
 import com.radiantmood.calarm.util.PermissionsUtil
 
 val AmbientPermissionsUtil = ambientOf<PermissionsUtil> { error("No PermissionsKit") }

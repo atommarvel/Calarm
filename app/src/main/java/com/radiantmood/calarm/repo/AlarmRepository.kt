@@ -35,8 +35,7 @@ class AlarmRepository {
 data class UserAlarm(
     @PrimaryKey val eventId: Int,
     val calendar: Calendar,
-    val title: String,
-    val offsetMin: Int = 0
+    val title: String
 )
 
 @Dao
