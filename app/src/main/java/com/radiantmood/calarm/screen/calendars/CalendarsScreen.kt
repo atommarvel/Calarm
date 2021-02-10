@@ -1,4 +1,4 @@
-package com.radiantmood.calarm.screen
+package com.radiantmood.calarm.screen.calendars
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -22,9 +22,9 @@ import com.radiantmood.calarm.AmbientMainViewModel
 import com.radiantmood.calarm.AmbientNavController
 import com.radiantmood.calarm.AmbientPermissionsUtil
 import com.radiantmood.calarm.MainViewModel
-import com.radiantmood.calarm.repo.CalendarRepository.ICal
-import com.radiantmood.calarm.repo.CalendarRepository.UserCal
+import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.AppBarAction
+import com.radiantmood.calarm.util.LoadingScreen
 
 @Composable
 fun CalendarsActivityScreen() {
@@ -32,8 +32,8 @@ fun CalendarsActivityScreen() {
     if (AmbientPermissionsUtil.current.checkPermissions(navController)) return
 
     val vm: MainViewModel = AmbientMainViewModel.current
-    val calendars: List<CalendarDisplay> by vm.calendarDisplays.observeAsState(listOf())
-    vm.getCalendarDisplays()
+    val screenModel: CalendarScreenModel by vm.calendarScreen.observeAsState(CalendarScreenModel.getEmpty())
+    vm.getCalendarDisplays() // Where should this ACTUALLY be called?
 
     Column {
         TopAppBar(title = { Text("Select Calendars to use") }, actions = {
@@ -41,34 +41,34 @@ fun CalendarsActivityScreen() {
                 navController.popBackStack()
             }
         })
-        CalendarList(calendars) {
-            vm.toggleSelectedCalendarId(it.id)
+        // TODO: a filter to only show selected calendars
+        when(screenModel.state) {
+            is LoadingState -> LoadingScreen()
+            else -> CalendarList(screenModel.calendarSelectionModels)
         }
     }
 }
 
-data class CalendarDisplay(private val userCal: UserCal, val isSelected: Boolean) : ICal by userCal
-
 @Composable
-fun CalendarList(calendars: List<CalendarDisplay>, selectCalendar: (CalendarDisplay) -> Unit) {
+fun CalendarList(calendars: List<CalendarSelectionModel>) {
     // TODO: loading view while waiting?
     LazyColumn {
         items(calendars) { calendar ->
-            CalendarRow(calendar) { selectCalendar(calendar) }
+            CalendarRow(calendar)
             Divider()
         }
     }
 }
 
 @Composable
-fun CalendarRow(calendar: CalendarDisplay, selectCalendar: () -> Unit) {
+fun CalendarRow(calendar: CalendarSelectionModel) {
     Row(
         modifier = Modifier
-            .clickable(onClick = selectCalendar)
+            .clickable(onClick = calendar.onCalendarToggled)
             .fillMaxWidth()
             .padding(16.dp)
     ) {
         Text(text = calendar.name, Modifier.weight(1f))
-        Switch(checked = calendar.isSelected, onCheckedChange = { selectCalendar() })
+        Switch(checked = calendar.isSelected, onCheckedChange = { calendar.onCalendarToggled() })
     }
 }

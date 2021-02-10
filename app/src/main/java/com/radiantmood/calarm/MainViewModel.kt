@@ -1,21 +1,29 @@
 package com.radiantmood.calarm
 
+import android.text.format.DateUtils
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.radiantmood.calarm.repo.*
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
-import com.radiantmood.calarm.screen.CalendarDisplay
 import com.radiantmood.calarm.screen.EventDisplay
+import com.radiantmood.calarm.screen.FinishedState
+import com.radiantmood.calarm.screen.calendars.CalendarScreenModel
+import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
 import com.radiantmood.calarm.util.AlarmUtil
+import com.radiantmood.calarm.util.TAG
+import com.radiantmood.calarm.util.bind
 import com.radiantmood.calarm.util.getDebugEventDisplay
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class MainViewModel : ViewModel() {
-    private var _calendarDisplays = MutableLiveData(listOf<CalendarDisplay>())
-    val calendarDisplays: LiveData<List<CalendarDisplay>> = _calendarDisplays
+    private var _calendarScreen = MutableLiveData(CalendarScreenModel.getEmpty())
+    val calendarScreen: LiveData<CalendarScreenModel> = _calendarScreen
 
     private var _eventDisplays = MutableLiveData(listOf<EventDisplay>())
     val eventDisplays: LiveData<List<EventDisplay>> = _eventDisplays
@@ -59,16 +67,16 @@ class MainViewModel : ViewModel() {
     fun getEventDisplays() = viewModelScope.launch {
         val selectedIds = selectedCalendarsRepo.getAll()
         val events = eventRepo.queryEvents()
-        val eventDisplays = events.filter { selectedIds.contains(it.calId) }.map {
+        val models = events.filter { selectedIds.contains(it.calId) }.map {
             val alarm = alarmRepo.getForEvent(it.eventId)
             EventDisplay(it, alarm)
         }.toMutableList()
 
         val debugAlarm = alarmRepo.getForEvent(-1)
         val withDebug = getDebugEventDisplay(debugAlarm)
-        eventDisplays.add(0, withDebug)
+        models.add(0, withDebug)
 
-        _eventDisplays.postValue(eventDisplays)
+        _eventDisplays.postValue(models)
     }
 
     fun getCalendarDisplays() = viewModelScope.launch {
@@ -84,13 +92,13 @@ class MainViewModel : ViewModel() {
     }
 
     private suspend fun postCalendarUpdate() {
-        _calendarDisplays.postValue(constructDisplays())
+        _calendarScreen.postValue(CalendarScreenModel(FinishedState, constructDisplays()))
     }
 
-    private suspend fun constructDisplays(): List<CalendarDisplay> {
-        val selectedIds = selectedCalendarsRepo.getAll()
+    private suspend fun constructDisplays(): List<CalendarSelectionModel> {
+        val selectedIds = selectedCalendarsRepo.getAll() // TODO: subscribe to changes to this instead
         return calendarRepo.queryCalendars().map { userCal ->
-            CalendarDisplay(userCal, selectedIds.contains(userCal.id))
+            CalendarSelectionModel(userCal.name, selectedIds.contains(userCal.id), ::toggleSelectedCalendarId.bind(userCal.id))
         }
     }
 }
