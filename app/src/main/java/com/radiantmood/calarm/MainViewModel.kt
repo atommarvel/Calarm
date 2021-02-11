@@ -1,5 +1,6 @@
 package com.radiantmood.calarm
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
 import com.radiantmood.calarm.screen.events.EventDisplay
 import com.radiantmood.calarm.screen.events.EventModel
 import com.radiantmood.calarm.screen.events.EventsScreenModel
+import com.radiantmood.calarm.screen.events.UnmappedAlarmModel
 import com.radiantmood.calarm.util.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -24,13 +26,20 @@ class MainViewModel : ViewModel() {
     private var _eventsScreen = MutableLiveData(EventsScreenModel.getEmpty())
     val eventsScreen: LiveData<EventsScreenModel> = _eventsScreen
 
+    private var isDebugMode = false
+
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
     private val calendarRepo = CalendarRepository()
     private val eventRepo = EventRepository()
 
-    // TODO: group alarm classes into a manager
+    // TODO: group alarm classes into a manager?
     private val alarmRepo = AlarmRepository()
     private val alarmUtil = AlarmUtil()
+
+    fun toggleDebug() {
+        isDebugMode = !isDebugMode
+        getEventDisplays()
+    }
 
     fun toggleAlarm(event: CalEvent) = viewModelScope.launch {
         val alarm = alarmRepo.getForEvent(event.eventId)
@@ -68,28 +77,39 @@ class MainViewModel : ViewModel() {
 
     fun getEventDisplays() = viewModelScope.launch {
         val selectedIds = selectedCalendarsRepo.getAll().toMutableList()
-        selectedIds.add(-1) // allow debug calendar
+        if (isDebugMode) selectedIds.add(-1) // allow debug calendar
         val events = eventRepo.queryEvents().toMutableList()
-        events.add(0, getDebugEvent()) // add debug event to top
-        val models = events.filter { selectedIds.contains(it.calId) }.map { event ->
-            val alarm = alarmRepo.getForEvent(event.eventId)
-            EventDisplay(event, alarm)
-            val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
-            val isAlarmSet = alarm != null
-            val offsetMillis = (alarm?.calendar?.timeInMillis ?: 0) - event.start.timeInMillis
-            val offsetMinutes = TimeUnit.MILLISECONDS.toMinutes(offsetMillis)
-            EventModel(
-                event.title,
-                timeRange,
-                isAlarmSet,
-                offsetMinutes.toInt(),
-                this@MainViewModel::toggleAlarm.bind(event),
-                this@MainViewModel::updateAlarmOffset.bind(alarm, 1),
-                this@MainViewModel::updateAlarmOffset.bind(alarm, -1)
-            )
-        }.toMutableList()
+        val eventIds = events.map { it.eventId }
+        if (isDebugMode) events.add(0, getDebugEvent()) // add debug event to top
+        val models = events.filter { selectedIds.contains(it.calId) }.map { createEventModel(it) }
+        val unmappedAlarmModels = alarmRepo.queryAlarms().filter { !eventIds.contains(it.eventId) }.map { createUnmappedAlarmModel(it) }
+        _eventsScreen.postValue(EventsScreenModel(FinishedState, models, unmappedAlarmModels, isDebugMode))
+    }
 
-        _eventsScreen.postValue(EventsScreenModel(FinishedState, models))
+    private fun createUnmappedAlarmModel(it: UserAlarm) =
+        UnmappedAlarmModel(
+            label = "title: \"${it.title}\"; eventId: \"${it.eventId}\" start: \"${it.calendar.formatTime()}\"",
+            onRemoveAlarm = ::cancelAlarm.bind(it)
+        )
+
+    private suspend fun createEventModel(event: CalEvent): EventModel {
+        val alarm = alarmRepo.getForEvent(event.eventId)
+        EventDisplay(event, alarm)
+        val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
+        val isAlarmSet = alarm != null
+        val offsetMillis = (alarm?.calendar?.timeInMillis ?: 0) - event.start.timeInMillis
+        val offsetMinutes = TimeUnit.MILLISECONDS.toMinutes(offsetMillis)
+        val debugData = if (isDebugMode) "eventId: ${event.eventId}" else null
+        return EventModel(
+            eventName = event.title,
+            timeRange = timeRange,
+            isAlarmSet = isAlarmSet,
+            alarmOffset = offsetMinutes.toInt(),
+            debugData = debugData,
+            onToggleAlarm = ::toggleAlarm.bind(event),
+            onIncreaseOffset = ::updateAlarmOffset.bind(alarm, 1),
+            onDecreaseOffset = ::updateAlarmOffset.bind(alarm, -1)
+        )
     }
 
     fun getCalendarDisplays() = viewModelScope.launch {
@@ -105,6 +125,7 @@ class MainViewModel : ViewModel() {
     }
 
     private suspend fun postCalendarUpdate() {
+        Log.i(TAG, "postCalendarUpdate: posting new calendar screen")
         _calendarsScreen.postValue(CalendarScreenModel(FinishedState, constructDisplays()))
     }
 

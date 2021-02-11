@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import com.radiantmood.calarm.AmbientMainViewModel
 import com.radiantmood.calarm.AmbientNavController
 import com.radiantmood.calarm.AmbientPermissionsUtil
-import com.radiantmood.calarm.MainViewModel
 import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.AppBarAction
 import com.radiantmood.calarm.util.LoadingScreen
@@ -30,10 +29,14 @@ import com.radiantmood.calarm.util.LoadingScreen
 fun CalendarsActivityScreen() {
     val navController = AmbientNavController.current
     if (AmbientPermissionsUtil.current.checkPermissions(navController)) return
+    AmbientMainViewModel.current.getCalendarDisplays()
+    CalendarsScreen()
+}
 
-    val vm: MainViewModel = AmbientMainViewModel.current
-    vm.getCalendarDisplays() // Where should this ACTUALLY be called?
-
+@Composable
+fun CalendarsScreen() {
+    val navController = AmbientNavController.current
+    val screenModel: CalendarScreenModel by AmbientMainViewModel.current.calendarsScreen.observeAsState(CalendarScreenModel.getEmpty())
     Column {
         TopAppBar(title = { Text("Select Calendars to use") }, actions = {
             AppBarAction(Icons.Default.Check) {
@@ -41,15 +44,12 @@ fun CalendarsActivityScreen() {
             }
         })
         // TODO: a filter to only show selected calendars
-        CalendarScreenContent()
+        CalendarScreenContent(screenModel)
     }
 }
 
 @Composable
-fun CalendarScreenContent() {
-    val vm: MainViewModel = AmbientMainViewModel.current
-    val screenModel: CalendarScreenModel by vm.calendarsScreen.observeAsState(CalendarScreenModel.getEmpty())
-
+fun CalendarScreenContent(screenModel: CalendarScreenModel) {
     when (screenModel.state) {
         is LoadingState -> LoadingScreen()
         else -> CalendarList(screenModel.calendarSelectionModels)
@@ -58,7 +58,6 @@ fun CalendarScreenContent() {
 
 @Composable
 fun CalendarList(calendars: List<CalendarSelectionModel>) {
-    // TODO: loading view while waiting?
     LazyColumn {
         items(calendars) { calendar ->
             CalendarRow(calendar)

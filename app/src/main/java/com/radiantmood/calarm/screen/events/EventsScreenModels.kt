@@ -12,13 +12,21 @@ data class EventModel(
     val timeRange: String,
     val isAlarmSet: Boolean,
     val alarmOffset: Int,
+    val debugData: String? = null,
     val onToggleAlarm: () -> Unit,
     val onIncreaseOffset: () -> Unit,
     val onDecreaseOffset: () -> Unit
 )
 
-data class EventsScreenModel(val state: ModelState, val eventModels: List<EventModel>) {
+data class UnmappedAlarmModel(val label: String, val onRemoveAlarm: () -> Unit)
+
+data class EventsScreenModel(
+    val state: ModelState,
+    val eventModels: List<EventModel>,
+    val unmappedAlarms: List<UnmappedAlarmModel>,
+    val showDebugAlarmButton: Boolean
+) {
     companion object {
-        fun getEmpty() = EventsScreenModel(LoadingState, emptyList())
+        fun getEmpty() = EventsScreenModel(LoadingState, emptyList(), emptyList(), false)
     }
 }

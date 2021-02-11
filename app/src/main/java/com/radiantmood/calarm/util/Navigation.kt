@@ -6,14 +6,14 @@ import androidx.navigation.compose.composable
 import com.radiantmood.calarm.AmbientNavController
 import com.radiantmood.calarm.screen.PermissionScreen
 import com.radiantmood.calarm.screen.calendars.CalendarsActivityScreen
-import com.radiantmood.calarm.screen.events.EventsScreen
+import com.radiantmood.calarm.screen.events.EventsActivityScreen
 
 
 @Composable
 fun InitNavHost() {
     val navController = AmbientNavController.current
     NavHost(navController, "alarms") {
-        composable("alarms") { EventsScreen() }
+        composable("alarms") { EventsActivityScreen() }
         composable("permission") { PermissionScreen() }
         composable("calendars") { CalendarsActivityScreen() }
     }

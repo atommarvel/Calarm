@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -28,13 +30,19 @@ import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.*
 
 @Composable
+fun EventsActivityScreen() {
+    val vm = AmbientMainViewModel.current
+    vm.getEventDisplays()
+    EventsScreen()
+}
+
+@Composable
 fun EventsScreen() {
     val navController = AmbientNavController.current
     if (AmbientPermissionsUtil.current.checkPermissions(navController)) return
 
     val vm = AmbientMainViewModel.current
     val screenModel: EventsScreenModel by vm.eventsScreen.observeAsState(EventsScreenModel.getEmpty())
-    vm.getEventDisplays()
 
     Column {
         // TODO: Strings -> resource ids
@@ -43,11 +51,14 @@ fun EventsScreen() {
             // TODO: add a quick way to get to calendar app
             // TODO: add a quick way to create an invisible event for 11:59 pm for testing
             // TODO: enable/disable debug calendar event
+            AppBarAction(imageVector = Icons.Default.BugReport) {
+                vm.toggleDebug()
+            }
             AppBarAction(vectorResource(R.drawable.ic_baseline_calendar_today_24)) {
                 navController.navigate("calendars")
             }
         })
-        DebugAlarmButton()
+        if (screenModel.showDebugAlarmButton) DebugAlarmButton()
         EventsContent(screenModel)
     }
 }
@@ -68,7 +79,7 @@ fun EventsContent(screenModel: EventsScreenModel) {
     when {
         screenModel.state is LoadingState -> LoadingScreen()
         screenModel.eventModels.isEmpty() -> NoEventsScreen()
-        else -> EventsList(screenModel.eventModels)
+        else -> EventsList(screenModel.eventModels, screenModel.unmappedAlarms)
     }
 }
 
@@ -78,12 +89,41 @@ fun NoEventsScreen() = Fullscreen {
 }
 
 @Composable
-fun EventsList(eventList: List<EventModel>) {
+fun EventsList(eventList: List<EventModel>, alarmList: List<UnmappedAlarmModel>) {
     LazyColumn {
         items(eventList) { event ->
             EventRow(event)
             Divider()
         }
+        UnmappedAlarmTitle(alarmList.isNotEmpty())
+        items(alarmList) { unmappedAlarm ->
+            UnmappedAlarmRow(unmappedAlarm)
+            Divider()
+        }
+    }
+}
+
+
+fun LazyListScope.UnmappedAlarmTitle(shouldShow: Boolean) {
+    if (shouldShow) {
+        item {
+            Text("Unmapped Alarms")
+        }
+    }
+}
+
+@Composable
+fun UnmappedAlarmRow(unmappedAlarm: UnmappedAlarmModel) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(unmappedAlarm.label, modifier = Modifier.weight(1f))
+        Switch(checked = true, onCheckedChange = {
+            unmappedAlarm.onRemoveAlarm()
+        })
     }
 }
 
@@ -95,14 +135,21 @@ fun EventRow(event: EventModel) {
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(event.eventName, fontSize = 18.sp)
-            Text(event.timeRange)
+        Column {
+            Row {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(event.eventName, fontSize = 18.sp)
+                    Text(event.timeRange)
+                }
+                if (event.isAlarmSet) {
+                    OffsetView(Modifier.weight(1f), event)
+                }
+                Switch(checked = event.isAlarmSet, onCheckedChange = { event.onToggleAlarm() })
+            }
+            event.debugData?.let {
+                Text(it)
+            }
         }
-        if (event.isAlarmSet) {
-            OffsetView(Modifier.weight(1f), event)
-        }
-        Switch(checked = event.isAlarmSet, onCheckedChange = { event.onToggleAlarm() })
     }
 }
 
