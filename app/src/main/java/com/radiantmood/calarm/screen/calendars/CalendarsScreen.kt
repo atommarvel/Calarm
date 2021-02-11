@@ -18,25 +18,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.radiantmood.calarm.AmbientMainViewModel
-import com.radiantmood.calarm.AmbientNavController
-import com.radiantmood.calarm.AmbientPermissionsUtil
+import com.radiantmood.calarm.LocalMainViewModel
+import com.radiantmood.calarm.LocalNavController
+import com.radiantmood.calarm.LocalPermissionsUtil
 import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.AppBarAction
 import com.radiantmood.calarm.util.LoadingScreen
 
 @Composable
 fun CalendarsActivityScreen() {
-    val navController = AmbientNavController.current
-    if (AmbientPermissionsUtil.current.checkPermissions(navController)) return
-    AmbientMainViewModel.current.getCalendarDisplays()
+    val navController = LocalNavController.current
+    if (LocalPermissionsUtil.current.checkPermissions(navController)) return
+    LocalMainViewModel.current.getCalendarDisplays()
     CalendarsScreen()
 }
 
 @Composable
 fun CalendarsScreen() {
-    val navController = AmbientNavController.current
-    val screenModel: CalendarScreenModel by AmbientMainViewModel.current.calendarsScreen.observeAsState(CalendarScreenModel.getEmpty())
+    val navController = LocalNavController.current
+    val screenModel: CalendarScreenModel by LocalMainViewModel.current.calendarsScreen.observeAsState(CalendarScreenModel.getEmpty())
     Column {
         TopAppBar(title = { Text("Select Calendars to use") }, actions = {
             AppBarAction(Icons.Default.Check) {

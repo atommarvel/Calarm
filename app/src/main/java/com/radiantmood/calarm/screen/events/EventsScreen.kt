@@ -22,26 +22,26 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.navigate
-import com.radiantmood.calarm.AmbientMainViewModel
-import com.radiantmood.calarm.AmbientNavController
-import com.radiantmood.calarm.AmbientPermissionsUtil
+import com.radiantmood.calarm.LocalMainViewModel
+import com.radiantmood.calarm.LocalNavController
+import com.radiantmood.calarm.LocalPermissionsUtil
 import com.radiantmood.calarm.R
 import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.*
 
 @Composable
 fun EventsActivityScreen() {
-    val vm = AmbientMainViewModel.current
+    val vm = LocalMainViewModel.current
     vm.getEventDisplays()
     EventsScreen()
 }
 
 @Composable
 fun EventsScreen() {
-    val navController = AmbientNavController.current
-    if (AmbientPermissionsUtil.current.checkPermissions(navController)) return
+    val navController = LocalNavController.current
+    if (LocalPermissionsUtil.current.checkPermissions(navController)) return
 
-    val vm = AmbientMainViewModel.current
+    val vm = LocalMainViewModel.current
     val screenModel: EventsScreenModel by vm.eventsScreen.observeAsState(EventsScreenModel.getEmpty())
 
     Column {
@@ -50,7 +50,6 @@ fun EventsScreen() {
         TopAppBar(title = { Text("Today's Alarms") }, actions = {
             // TODO: add a quick way to get to calendar app
             // TODO: add a quick way to create an invisible event for 11:59 pm for testing
-            // TODO: enable/disable debug calendar event
             AppBarAction(imageVector = Icons.Default.BugReport) {
                 vm.toggleDebug()
             }
@@ -65,7 +64,7 @@ fun EventsScreen() {
 
 @Composable
 fun DebugAlarmButton() {
-    val vm = AmbientMainViewModel.current
+    val vm = LocalMainViewModel.current
     Button({
         val event = getDebugEvent(getFutureCalendar(secondsInFuture = 10))
         vm.scheduleAlarm(event.eventId, event.start, event.title)

@@ -11,8 +11,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.radiantmood.calarm.AmbientNavController
-import com.radiantmood.calarm.AmbientPermissionsUtil
+import com.radiantmood.calarm.LocalNavController
+import com.radiantmood.calarm.LocalPermissionsUtil
 import com.radiantmood.calarm.util.Fullscreen
 import com.radiantmood.calarm.util.PermissionsUtil
 import kotlinx.coroutines.Dispatchers
@@ -23,8 +23,8 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun PermissionScreen() {
-    val navController = AmbientNavController.current
-    val permissionsUtil = AmbientPermissionsUtil.current
+    val navController = LocalNavController.current
+    val permissionsUtil = LocalPermissionsUtil.current
 
     Fullscreen {
         Text(text = "Missing Permissions", fontSize = 24.sp, textAlign = TextAlign.Center)

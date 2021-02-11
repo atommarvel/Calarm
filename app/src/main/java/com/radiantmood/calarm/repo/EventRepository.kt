@@ -11,7 +11,6 @@ import java.util.*
 
 class EventRepository {
 
-    // TODO: why is this getting called a ton?
     @WorkerThread
     suspend fun queryEvents(): List<CalEvent> = EventCursor().map { it }.sortedBy { it.start }
 

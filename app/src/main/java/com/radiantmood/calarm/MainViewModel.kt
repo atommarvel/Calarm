@@ -131,7 +131,7 @@ class MainViewModel : ViewModel() {
     }
 
     private suspend fun constructDisplays(): List<CalendarSelectionModel> {
-        val selectedIds = selectedCalendarsRepo.getAll() // TODO: subscribe to changes to this instead
+        val selectedIds = selectedCalendarsRepo.getAll()
         return calendarRepo.queryCalendars().map { userCal ->
             CalendarSelectionModel(userCal.name, selectedIds.contains(userCal.id), ::toggleSelectedCalendarId.bind(userCal.id))
         }

@@ -15,8 +15,8 @@ import com.radiantmood.calarm.util.Fullscreen
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewAlarmExperienceScreen() {
-    AlarmExperienceScreen(title = "Alarm", stopExperience = { /*TODO*/ })
+fun Preview_AlarmExperienceScreen() {
+    AlarmExperienceScreen(title = "Alarm", stopExperience = { /*Do Nothing*/ })
 }
 
 @Composable
