@@ -43,7 +43,7 @@ class MainViewModel : ViewModel() {
         if (alarm != null) {
             alarmUtil.cancelAlarm(alarm)
             val calendar = Calendar.getInstance().apply {
-                timeInMillis = alarm.calendar.timeInMillis + TimeUnit.SECONDS.toMillis(offsetChangeMinutes.toLong())
+                timeInMillis = alarm.calendar.timeInMillis + TimeUnit.MINUTES.toMillis(offsetChangeMinutes.toLong())
             }
             scheduleAlarm(alarm.eventId, calendar, alarm.title)
         }
@@ -77,15 +77,15 @@ class MainViewModel : ViewModel() {
             val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
             val isAlarmSet = alarm != null
             val offsetMillis = (alarm?.calendar?.timeInMillis ?: 0) - event.start.timeInMillis
-            val offsetSeconds = TimeUnit.MILLISECONDS.toSeconds(offsetMillis)
+            val offsetMinutes = TimeUnit.MILLISECONDS.toMinutes(offsetMillis)
             EventModel(
                 event.title,
                 timeRange,
                 isAlarmSet,
-                offsetSeconds.toInt(),
+                offsetMinutes.toInt(),
                 this@MainViewModel::toggleAlarm.bind(event),
                 this@MainViewModel::updateAlarmOffset.bind(alarm, 1),
-                this@MainViewModel::updateAlarmOffset.bind(alarm, 2)
+                this@MainViewModel::updateAlarmOffset.bind(alarm, -1)
             )
         }.toMutableList()
 
