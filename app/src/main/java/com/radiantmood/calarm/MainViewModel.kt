@@ -1,6 +1,5 @@
 package com.radiantmood.calarm
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,7 +13,10 @@ import com.radiantmood.calarm.screen.events.EventDisplay
 import com.radiantmood.calarm.screen.events.EventModel
 import com.radiantmood.calarm.screen.events.EventsScreenModel
 import com.radiantmood.calarm.screen.events.UnmappedAlarmModel
-import com.radiantmood.calarm.util.*
+import com.radiantmood.calarm.util.AlarmUtil
+import com.radiantmood.calarm.util.bind
+import com.radiantmood.calarm.util.formatTime
+import com.radiantmood.calarm.util.getDebugEvent
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -125,7 +127,6 @@ class MainViewModel : ViewModel() {
     }
 
     private suspend fun postCalendarUpdate() {
-        Log.i(TAG, "postCalendarUpdate: posting new calendar screen")
         _calendarsScreen.postValue(CalendarScreenModel(FinishedState, constructDisplays()))
     }
 
