@@ -24,7 +24,8 @@ data class EventsScreenModel(
     val state: ModelState,
     val eventModels: List<EventModel>,
     val unmappedAlarms: List<UnmappedAlarmModel>,
-    val showDebugAlarmButton: Boolean
+    val showDebugAlarmButton: Boolean,
+    val fullScreenMessage: String? = null,
 ) {
     companion object {
         fun getEmpty() = EventsScreenModel(LoadingState, emptyList(), emptyList(), false)

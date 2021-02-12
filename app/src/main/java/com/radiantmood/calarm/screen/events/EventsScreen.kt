@@ -22,15 +22,14 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.navigate
-import com.radiantmood.calarm.LocalMainViewModel
-import com.radiantmood.calarm.LocalNavController
-import com.radiantmood.calarm.LocalPermissionsUtil
-import com.radiantmood.calarm.R
+import com.radiantmood.calarm.*
 import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.*
 
 @Composable
 fun EventsActivityScreen() {
+    val navController = LocalNavController.current
+    if (LocalPermissionsUtil.current.checkPermissions(navController)) return
     val vm = LocalMainViewModel.current
     vm.getEventDisplays()
     EventsScreen()
@@ -39,8 +38,6 @@ fun EventsActivityScreen() {
 @Composable
 fun EventsScreen() {
     val navController = LocalNavController.current
-    if (LocalPermissionsUtil.current.checkPermissions(navController)) return
-
     val vm = LocalMainViewModel.current
     val screenModel: EventsScreenModel by vm.eventsScreen.observeAsState(EventsScreenModel.getEmpty())
 
@@ -50,10 +47,13 @@ fun EventsScreen() {
         TopAppBar(title = { Text("Today's Alarms") }, actions = {
             // TODO: add a quick way to get to calendar app
             // TODO: add a quick way to create an invisible event for 11:59 pm for testing
-            AppBarAction(imageVector = Icons.Default.BugReport) {
-                // TODO: toggling debug and then flinging the list results in a compose embedded crash. Why?
-                vm.toggleDebug()
+            if (BuildConfig.DEBUG) {
+                AppBarAction(imageVector = Icons.Default.BugReport) {
+                    // TODO: toggling debug and then flinging the list results in a compose embedded crash. Why?
+                    vm.toggleDebug()
+                }
             }
+            // TODO: vectorResource method deprecated!
             AppBarAction(vectorResource(R.drawable.ic_baseline_calendar_today_24)) {
                 navController.navigate("calendars")
             }
@@ -61,7 +61,7 @@ fun EventsScreen() {
         if (screenModel.showDebugAlarmButton) DebugAlarmButton()
         when {
             screenModel.state is LoadingState -> LoadingScreen()
-            screenModel.eventModels.isEmpty() -> NoEventsScreen()
+            !screenModel.fullScreenMessage.isNullOrBlank() -> MessageScreen(screenModel.fullScreenMessage!!)
             else -> EventsList(screenModel.eventModels, screenModel.unmappedAlarms)
         }
     }
@@ -79,8 +79,8 @@ fun DebugAlarmButton() {
 }
 
 @Composable
-fun NoEventsScreen() = Fullscreen {
-    Text("No more events today!")
+fun MessageScreen(message: String) = Fullscreen {
+    Text(message)
 }
 
 @Composable

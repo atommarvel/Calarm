@@ -83,9 +83,14 @@ class MainViewModel : ViewModel() {
         val events = eventRepo.queryEvents().toMutableList()
         val eventIds = events.map { it.eventId }
         if (isDebugMode) events.add(0, getDebugEvent()) // add debug event to top
-        val models = events.filter { selectedIds.contains(it.calId) }.map { createEventModel(it) }
+        val eventModels = events.filter { selectedIds.contains(it.calId) }.map { createEventModel(it) }
         val unmappedAlarmModels = alarmRepo.queryAlarms().filter { !eventIds.contains(it.eventId) }.map { createUnmappedAlarmModel(it) }
-        _eventsScreen.postValue(EventsScreenModel(FinishedState, models, unmappedAlarmModels, isDebugMode))
+        val fullScreenMessage = when {
+            selectedIds.isEmpty() -> "No calendars selected."
+            eventModels.isEmpty() -> "No events today!"
+            else -> null
+        }
+        _eventsScreen.postValue(EventsScreenModel(FinishedState, eventModels, unmappedAlarmModels, isDebugMode, fullScreenMessage))
     }
 
     private fun createUnmappedAlarmModel(it: UserAlarm) =
@@ -121,6 +126,7 @@ class MainViewModel : ViewModel() {
     fun toggleSelectedCalendarId(id: Int) = viewModelScope.launch {
         val ids = selectedCalendarsRepo.getAll()
         if (ids.contains(id)) {
+            // TODO: should we cancel all related alarms?
             selectedCalendarsRepo.remove(id)
         } else selectedCalendarsRepo.add(id)
         postCalendarUpdate()
