@@ -51,6 +51,7 @@ fun EventsScreen() {
             // TODO: add a quick way to get to calendar app
             // TODO: add a quick way to create an invisible event for 11:59 pm for testing
             AppBarAction(imageVector = Icons.Default.BugReport) {
+                // TODO: toggling debug and then flinging the list results in a compose embedded crash. Why?
                 vm.toggleDebug()
             }
             AppBarAction(vectorResource(R.drawable.ic_baseline_calendar_today_24)) {
@@ -58,7 +59,11 @@ fun EventsScreen() {
             }
         })
         if (screenModel.showDebugAlarmButton) DebugAlarmButton()
-        EventsContent(screenModel)
+        when {
+            screenModel.state is LoadingState -> LoadingScreen()
+            screenModel.eventModels.isEmpty() -> NoEventsScreen()
+            else -> EventsList(screenModel.eventModels, screenModel.unmappedAlarms)
+        }
     }
 }
 
@@ -70,15 +75,6 @@ fun DebugAlarmButton() {
         vm.scheduleAlarm(event.eventId, event.start, event.title)
     }) {
         Text("Schedule alarm 20 seconds from now")
-    }
-}
-
-@Composable
-fun EventsContent(screenModel: EventsScreenModel) {
-    when {
-        screenModel.state is LoadingState -> LoadingScreen()
-        screenModel.eventModels.isEmpty() -> NoEventsScreen()
-        else -> EventsList(screenModel.eventModels, screenModel.unmappedAlarms)
     }
 }
 

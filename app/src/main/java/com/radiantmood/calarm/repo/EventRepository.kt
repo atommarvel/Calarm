@@ -30,7 +30,7 @@ class EventRepository {
             CalendarContract.Instances.TITLE,
             CalendarContract.Instances.BEGIN,
             CalendarContract.Instances.END,
-            CalendarContract.Instances._ID
+            CalendarContract.Instances.EVENT_ID
         )
 
         init {
