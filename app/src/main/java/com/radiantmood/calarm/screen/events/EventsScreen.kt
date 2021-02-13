@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.navigate
 import com.radiantmood.calarm.*
+import com.radiantmood.calarm.R
 import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.*
 
