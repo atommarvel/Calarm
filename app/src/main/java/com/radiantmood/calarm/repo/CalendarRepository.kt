@@ -4,8 +4,7 @@ import android.content.ContentResolver
 import android.database.Cursor
 import android.net.Uri
 import android.provider.CalendarContract.Calendars
-import android.provider.CalendarContract.Calendars.CALENDAR_DISPLAY_NAME
-import android.provider.CalendarContract.Calendars._ID
+import android.provider.CalendarContract.Calendars.*
 import androidx.annotation.WorkerThread
 import com.radiantmood.calarm.calarm
 import com.radiantmood.calarm.repo.CursorValueType.INT
@@ -20,13 +19,15 @@ class CalendarRepository {
     class NewCalendarCursor : CursorHelper<UserCal>() {
         val id = _ID via INT
         val name = CALENDAR_DISPLAY_NAME via STRING
+        val color = CALENDAR_COLOR via INT
 
-        override val projections: List<Projection> = listOf(id, name)
+        override val projections: List<Projection> = listOf(id, name, color)
 
         override fun assemble(cursor: Cursor): UserCal =
             UserCal(
                 id = this[id],
-                name = this[name]
+                name = this[name],
+                colorInt = this[color]
             )
 
         override val cursor: Cursor by lazy {
@@ -41,5 +42,5 @@ class CalendarRepository {
         val name: String
     }
 
-    data class UserCal(override val id: Int, override val name: String) : ICal
+    data class UserCal(override val id: Int, override val name: String, val colorInt: Int) : ICal
 }

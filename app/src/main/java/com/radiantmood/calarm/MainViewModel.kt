@@ -1,5 +1,6 @@
 package com.radiantmood.calarm
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -134,7 +135,7 @@ class MainViewModel : ViewModel() {
     private suspend fun constructDisplays(): List<CalendarSelectionModel> {
         val selectedIds = selectedCalendarsRepo.getAll()
         return calendarRepo.queryCalendars().map { userCal ->
-            CalendarSelectionModel(userCal.name, selectedIds.contains(userCal.id), ::toggleSelectedCalendarId.bind(userCal.id))
+            CalendarSelectionModel(userCal.name, selectedIds.contains(userCal.id), Color(userCal.colorInt), ::toggleSelectedCalendarId.bind(userCal.id))
         }
     }
 }
