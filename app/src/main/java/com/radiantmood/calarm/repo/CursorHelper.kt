@@ -3,9 +3,11 @@ package com.radiantmood.calarm.repo
 import android.database.Cursor
 import com.radiantmood.calarm.repo.CursorValueType.*
 
-abstract class CursorHelper<T> : Iterable<T> {
+interface CursorCreator {
+    val cursor: Cursor
+}
 
-    abstract val cursor: Cursor
+abstract class CursorHelper<T> : Iterable<T>, CursorCreator {
 
     abstract val projections: List<Projection>
 

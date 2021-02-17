@@ -19,6 +19,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.navigate
@@ -45,7 +47,7 @@ fun EventsScreen() {
     Column {
         // TODO: Strings -> resource ids
         // TODO: Scaffold
-        TopAppBar(title = { Text("Today's Alarms") }, actions = {
+        TopAppBar(title = { Text("Events") }, actions = {
             // TODO: add a quick way to get to calendar app
             // TODO: add a quick way to create an invisible event for 11:59 pm for testing
             if (BuildConfig.DEBUG) {
@@ -63,7 +65,7 @@ fun EventsScreen() {
         when {
             screenModel.state is LoadingState -> LoadingScreen()
             !screenModel.fullScreenMessage.isNullOrBlank() -> MessageScreen(screenModel.fullScreenMessage!!)
-            else -> EventsList(screenModel.eventModels, screenModel.unmappedAlarms)
+            else -> EventsList(screenModel.eventModels, screenModel.tmoEventModels, screenModel.unmappedAlarms)
         }
     }
 }
@@ -85,13 +87,18 @@ fun MessageScreen(message: String) = Fullscreen {
 }
 
 @Composable
-fun EventsList(eventList: List<EventModel>, alarmList: List<UnmappedAlarmModel>) {
+fun EventsList(eventList: List<EventModel>, tmoEventList: List<EventModel>, alarmList: List<UnmappedAlarmModel>) {
     LazyColumn {
         items(eventList) { event ->
             EventRow(event)
             Divider()
         }
-        UnmappedAlarmTitle(alarmList.isNotEmpty())
+        SectionTitle(tmoEventList.isNotEmpty(), "Tomorrow's Events")
+        items(tmoEventList) { event ->
+            EventRow(event)
+            Divider()
+        }
+        SectionTitle(alarmList.isNotEmpty(), "Unmapped Alarms")
         items(alarmList) { unmappedAlarm ->
             UnmappedAlarmRow(unmappedAlarm)
             Divider()
@@ -99,11 +106,10 @@ fun EventsList(eventList: List<EventModel>, alarmList: List<UnmappedAlarmModel>)
     }
 }
 
-
-fun LazyListScope.UnmappedAlarmTitle(shouldShow: Boolean) {
+fun LazyListScope.SectionTitle(shouldShow: Boolean, title: String) {
     if (shouldShow) {
         item {
-            Text("Unmapped Alarms")
+            Text(title, fontSize = 24.sp, modifier = Modifier.padding(12.dp), style = TextStyle(textDecoration = TextDecoration.Underline))
         }
     }
 }

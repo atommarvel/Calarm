@@ -9,14 +9,29 @@ import androidx.annotation.WorkerThread
 import com.radiantmood.calarm.calarm
 import com.radiantmood.calarm.repo.CursorValueType.*
 import com.radiantmood.calarm.util.CalendarAtTime
+import com.radiantmood.calarm.util.atEndOfDay
+import com.radiantmood.calarm.util.atStartOfDay
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class EventRepository {
 
     @WorkerThread
     suspend fun queryEvents(): List<CalEvent> = EventCursor().map { it }.sortedBy { it.start }
 
-    class EventCursor : CursorHelper<CalEvent>() {
+    @WorkerThread
+    suspend fun queryTomorrowsEvents(): List<CalEvent> {
+        val tmoMillis = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1)
+        return EventCursor(
+            startTime = CalendarAtTime(tmoMillis).atStartOfDay(),
+            endTime = CalendarAtTime(tmoMillis).atEndOfDay()
+        ).map { it }.sortedBy { it.start }
+    }
+
+    class EventCursor(
+        val startTime: Calendar = CalendarAtTime(System.currentTimeMillis()),
+        val endTime: Calendar = CalendarAtTime(System.currentTimeMillis()).atEndOfDay()
+    ) : CursorHelper<CalEvent>() {
 
         val calId = CALENDAR_ID via INT
         val title = TITLE via STRING
@@ -46,21 +61,8 @@ class EventRepository {
          */
         override val cursor: Cursor by lazy {
             val builder: Uri.Builder = CONTENT_URI.buildUpon()
-
-            val start = System.currentTimeMillis()
-            // TODO: get tomorrow's events as well
-            val end = Calendar.getInstance().apply {
-                timeInMillis = start
-                set(Calendar.HOUR_OF_DAY, 23)
-                set(Calendar.MINUTE, 59)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-                set(Calendar.HOUR, 11)
-                set(Calendar.AM_PM, 1)
-            }.timeInMillis
-
-            ContentUris.appendId(builder, start)
-            ContentUris.appendId(builder, end)
+            ContentUris.appendId(builder, startTime.timeInMillis)
+            ContentUris.appendId(builder, endTime.timeInMillis)
             // TODO: only query for selected calendars
             val contentResolver: ContentResolver = calarm.contentResolver
             // TODO: sort order

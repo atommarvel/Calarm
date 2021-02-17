@@ -23,11 +23,12 @@ data class UnmappedAlarmModel(val label: String, val onRemoveAlarm: () -> Unit)
 data class EventsScreenModel(
     val state: ModelState,
     val eventModels: List<EventModel>,
+    val tmoEventModels: List<EventModel>,
     val unmappedAlarms: List<UnmappedAlarmModel>,
     val showDebugAlarmButton: Boolean,
     val fullScreenMessage: String? = null,
 ) {
     companion object {
-        fun getEmpty() = EventsScreenModel(LoadingState, emptyList(), emptyList(), false)
+        fun getEmpty() = EventsScreenModel(LoadingState, emptyList(), emptyList(), emptyList(), false)
     }
 }
