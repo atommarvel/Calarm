@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit
 private const val timePattern = "h:mma"
 private fun getTimeFormat() = SimpleDateFormat(timePattern, Locale.getDefault())
 
+fun CalendarAtTime(timeInMilliseconds: Long) = Calendar.getInstance().apply { timeInMillis = timeInMilliseconds }
+
 fun Calendar.formatTime() = getTimeFormat().format(time).orEmpty()
 
 fun getFutureCalendar(initialCalendar: Calendar? = null, secondsInFuture: Long = 0, minutesInFuture: Long = 0) = Calendar.getInstance().apply {

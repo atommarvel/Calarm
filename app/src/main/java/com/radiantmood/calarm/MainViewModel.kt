@@ -13,10 +13,7 @@ import com.radiantmood.calarm.screen.events.EventDisplay
 import com.radiantmood.calarm.screen.events.EventModel
 import com.radiantmood.calarm.screen.events.EventsScreenModel
 import com.radiantmood.calarm.screen.events.UnmappedAlarmModel
-import com.radiantmood.calarm.util.AlarmUtil
-import com.radiantmood.calarm.util.bind
-import com.radiantmood.calarm.util.formatTime
-import com.radiantmood.calarm.util.getDebugEvent
+import com.radiantmood.calarm.util.*
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -53,9 +50,7 @@ class MainViewModel : ViewModel() {
     fun updateAlarmOffset(alarm: UserAlarm?, offsetChangeMinutes: Int) = viewModelScope.launch {
         if (alarm != null) {
             alarmUtil.cancelAlarm(alarm)
-            val calendar = Calendar.getInstance().apply {
-                timeInMillis = alarm.calendar.timeInMillis + TimeUnit.MINUTES.toMillis(offsetChangeMinutes.toLong())
-            }
+            val calendar = CalendarAtTime(alarm.calendar.timeInMillis + TimeUnit.MINUTES.toMillis(offsetChangeMinutes.toLong()))
             scheduleAlarm(alarm.eventId, calendar, alarm.title)
         }
     }

@@ -4,11 +4,11 @@ import android.content.ContentResolver
 import android.content.ContentUris
 import android.database.Cursor
 import android.net.Uri
-import android.provider.CalendarContract
 import android.provider.CalendarContract.Instances.*
 import androidx.annotation.WorkerThread
 import com.radiantmood.calarm.calarm
 import com.radiantmood.calarm.repo.CursorValueType.*
+import com.radiantmood.calarm.util.CalendarAtTime
 import java.util.*
 
 class EventRepository {
@@ -27,12 +27,8 @@ class EventRepository {
         override val projections: List<Projection> = listOf(calId, title, begin, end, eventId)
 
         override fun assemble(cursor: Cursor): CalEvent {
-            val calStart = Calendar.getInstance().apply {
-                timeInMillis = this@EventCursor[begin]
-            }
-            val calEnd = Calendar.getInstance().apply {
-                timeInMillis = this@EventCursor[end]
-            }
+            val calStart = CalendarAtTime(this[begin])
+            val calEnd = CalendarAtTime(this[end])
             return CalEvent(
                 calId = this[calId],
                 eventId = this[eventId],
@@ -49,7 +45,7 @@ class EventRepository {
          * https://github.com/CyanogenMod/android_packages_apps_Calendar/blob/cm-12.0/src/com/android/calendar/Event.java#L307
          */
         override val cursor: Cursor by lazy {
-            val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
+            val builder: Uri.Builder = CONTENT_URI.buildUpon()
 
             val start = System.currentTimeMillis()
             // TODO: get tomorrow's events as well
