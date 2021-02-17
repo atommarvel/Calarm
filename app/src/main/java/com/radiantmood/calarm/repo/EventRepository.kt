@@ -37,6 +37,7 @@ class EventRepository {
             val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
 
             val start = System.currentTimeMillis()
+            // TODO: get tomorrow's events as well
             val end = Calendar.getInstance().apply {
                 timeInMillis = start
                 set(Calendar.HOUR_OF_DAY, 23)

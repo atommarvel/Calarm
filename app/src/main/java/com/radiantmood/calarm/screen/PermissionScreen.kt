@@ -40,7 +40,6 @@ fun PermissionScreen() {
         if (!permissionsUtil.isOverlayPermissionGranted()) {
             Text(text = "We need to be show an alarm even if the phone screen is locked.", textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(16.dp))
-            // TODO: re-render (via onResume?) after coming back from granting permission
             Button(onClick = { permissionsUtil.requestOverlayPermission() }) {
                 Text(text = "Grant Overlay Permission")
             }
