@@ -21,10 +21,7 @@ class CalendarRepository {
         val id = _ID via INT
         val name = CALENDAR_DISPLAY_NAME via STRING
 
-        override val projections: List<Projection> = listOf(
-            id,
-            name
-        )
+        override val projections: List<Projection> = listOf(id, name)
 
         override fun assemble(cursor: Cursor): UserCal =
             UserCal(
