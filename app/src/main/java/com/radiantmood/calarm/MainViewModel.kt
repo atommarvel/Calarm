@@ -78,11 +78,15 @@ class MainViewModel : ViewModel() {
         if (isDebugMode) selectedIds.add(-1) // allow debug calendar
         val events = eventRepo.queryEvents().toMutableList()
         val tmoEvents = eventRepo.queryTomorrowsEvents()
-        val eventIds = events.map { it.eventId }
+        val eventIds = events.map { it.eventId }.toMutableList().apply {
+            tmoEvents.forEach { add(it.eventId) }
+        }.toList()
         if (isDebugMode) events.add(0, getDebugEvent()) // add debug event to top
         val eventModels = events.filter { selectedIds.contains(it.calId) }.map { createEventModel(it) }
         val tmoEventModels = tmoEvents.filter { selectedIds.contains(it.calId) }.map { createEventModel(it) }
-        val unmappedAlarmModels = alarmRepo.queryAlarms().filter { !eventIds.contains(it.eventId) }.map { createUnmappedAlarmModel(it) }
+        val unmappedAlarmModels = alarmRepo.queryAlarms()
+            .filter { !eventIds.contains(it.eventId) }
+            .map { createUnmappedAlarmModel(it) }
         val fullScreenMessage = when {
             selectedIds.isEmpty() -> "No calendars selected."
             eventModels.isEmpty() -> "No events today!"
