@@ -13,6 +13,7 @@ import com.radiantmood.calarm.util.PermissionsUtil
 val LocalPermissionsUtil = compositionLocalOf<PermissionsUtil> { error("No PermissionsKit") }
 val LocalMainViewModel = compositionLocalOf<MainViewModel> { error("No MainViewModel") }
 val LocalNavController = compositionLocalOf<NavHostController> { error("No NavController") }
+val LocalAppBarTitle = compositionLocalOf<String> { error("No AppBarTitle") }
 
 @Composable
 fun App(activity: ComponentActivity) {

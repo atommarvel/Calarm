@@ -14,17 +14,24 @@ import com.radiantmood.calarm.screen.events.EventDisplay
 import com.radiantmood.calarm.screen.events.EventModel
 import com.radiantmood.calarm.screen.events.EventsScreenModel
 import com.radiantmood.calarm.screen.events.UnmappedAlarmModel
+import com.radiantmood.calarm.screen.settings.SettingsScreenModel
 import com.radiantmood.calarm.util.*
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * TODO: split into multiple view models
+ */
 class MainViewModel : ViewModel() {
     private var _calendarsScreen = MutableLiveData(CalendarScreenModel.getEmpty())
     val calendarsScreen: LiveData<CalendarScreenModel> = _calendarsScreen
 
     private var _eventsScreen = MutableLiveData(EventsScreenModel.getEmpty())
     val eventsScreen: LiveData<EventsScreenModel> = _eventsScreen
+
+    private var _settingsScreen = MutableLiveData(SettingsScreenModel.getEmpty())
+    val settingsScreen: LiveData<SettingsScreenModel> = _settingsScreen
 
     private var isDebugMode = false
 

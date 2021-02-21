@@ -9,20 +9,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.radiantmood.calarm.LocalAppBarTitle
 import com.radiantmood.calarm.LocalMainViewModel
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.LocalPermissionsUtil
 import com.radiantmood.calarm.screen.LoadingState
-import com.radiantmood.calarm.util.AppBarAction
+import com.radiantmood.calarm.util.CalarmTopAppBar
 import com.radiantmood.calarm.util.LoadingScreen
 
 @Composable
@@ -30,19 +29,16 @@ fun CalendarsActivityScreen() {
     val navController = LocalNavController.current
     if (LocalPermissionsUtil.current.checkPermissions(navController)) return
     LocalMainViewModel.current.getCalendarDisplays()
-    CalendarsScreen()
+    Providers(LocalAppBarTitle provides "Select Calendars to use") {
+        CalendarsScreen()
+    }
 }
 
 @Composable
 fun CalendarsScreen() {
-    val navController = LocalNavController.current
     val screenModel: CalendarScreenModel by LocalMainViewModel.current.calendarsScreen.observeAsState(CalendarScreenModel.getEmpty())
     Column {
-        TopAppBar(title = { Text("Select Calendars to use") }, actions = {
-            AppBarAction(Icons.Default.Check) {
-                navController.popBackStack()
-            }
-        })
+        CalarmTopAppBar()
         // TODO: a filter to only show selected calendars
         CalendarScreenContent(screenModel)
     }

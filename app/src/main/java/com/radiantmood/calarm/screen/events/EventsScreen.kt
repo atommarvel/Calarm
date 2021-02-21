@@ -8,24 +8,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Divider
+import androidx.compose.material.Switch
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.navigate
 import com.radiantmood.calarm.*
-import com.radiantmood.calarm.R
 import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.*
 
@@ -35,7 +38,9 @@ fun EventsActivityScreen() {
     if (LocalPermissionsUtil.current.checkPermissions(navController)) return
     val vm = LocalMainViewModel.current
     vm.getEventDisplays()
-    EventsScreen()
+    Providers(LocalAppBarTitle provides "Events") {
+        EventsScreen()
+    }
 }
 
 @Composable
@@ -47,7 +52,7 @@ fun EventsScreen() {
     Column {
         // TODO: Strings -> resource ids
         // TODO: Scaffold
-        TopAppBar(title = { Text("Events") }, actions = {
+        CalarmTopAppBar(actions = {
             // TODO: add a quick way to get to calendar app
             // TODO: add a quick way to create an invisible event for 11:59 pm for testing
             if (BuildConfig.DEBUG) {
@@ -57,8 +62,8 @@ fun EventsScreen() {
                 }
             }
             // TODO: vectorResource method deprecated!
-            AppBarAction(vectorResource(R.drawable.ic_baseline_calendar_today_24)) {
-                navController.navigate("calendars")
+            AppBarAction(Icons.Default.Settings) {
+                navController.navigate("settings")
             }
         })
         if (screenModel.showDebugAlarmButton) DebugAlarmButton()
