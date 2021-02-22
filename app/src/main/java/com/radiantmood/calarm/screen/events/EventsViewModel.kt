@@ -67,9 +67,9 @@ class EventsViewModel : ViewModel() {
 
     fun getData() = viewModelScope.launch {
         val selectedIds = selectedCalendarsRepo.getAll().toMutableList()
+        val events = eventRepo.queryEvents(selectedIds).toMutableList()
+        val tmoEvents = eventRepo.queryTomorrowsEvents(selectedIds)
         if (isDebugMode) selectedIds.add(-1) // allow debug calendar
-        val events = eventRepo.queryEvents().toMutableList()
-        val tmoEvents = eventRepo.queryTomorrowsEvents()
         val eventIds = events.map { it.eventId }.toMutableList().apply {
             tmoEvents.forEach { add(it.eventId) }
         }.toList()

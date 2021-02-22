@@ -5,10 +5,12 @@ import android.content.ContentUris
 import android.database.Cursor
 import android.net.Uri
 import android.provider.CalendarContract.Instances.*
+import android.util.Log
 import androidx.annotation.WorkerThread
 import com.radiantmood.calarm.calarm
 import com.radiantmood.calarm.repo.CursorValueType.*
 import com.radiantmood.calarm.util.CalendarAtTime
+import com.radiantmood.calarm.util.TAG
 import com.radiantmood.calarm.util.atEndOfDay
 import com.radiantmood.calarm.util.atStartOfDay
 import java.util.*
@@ -17,20 +19,22 @@ import java.util.concurrent.TimeUnit
 class EventRepository {
 
     @WorkerThread
-    suspend fun queryEvents(): List<CalEvent> = EventCursor().map { it }.sortedBy { it.start }
+    suspend fun queryEvents(calIds: List<Int> = emptyList()): List<CalEvent> = EventCursor(calIds = calIds).map { it }.sortedBy { it.start }
 
     @WorkerThread
-    suspend fun queryTomorrowsEvents(): List<CalEvent> {
+    suspend fun queryTomorrowsEvents(calIds: List<Int> = emptyList()): List<CalEvent> {
         val tmoMillis = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1)
         return EventCursor(
             startTime = CalendarAtTime(tmoMillis).atStartOfDay(),
-            endTime = CalendarAtTime(tmoMillis).atEndOfDay()
+            endTime = CalendarAtTime(tmoMillis).atEndOfDay(),
+            calIds = calIds
         ).map { it }.sortedBy { it.start }
     }
 
     class EventCursor(
-        val startTime: Calendar = CalendarAtTime(System.currentTimeMillis()),
-        val endTime: Calendar = CalendarAtTime(System.currentTimeMillis()).atEndOfDay()
+        private val startTime: Calendar = CalendarAtTime(System.currentTimeMillis()),
+        private val endTime: Calendar = CalendarAtTime(System.currentTimeMillis()).atEndOfDay(),
+        private val calIds: List<Int> = emptyList()
     ) : CursorHelper<CalEvent>() {
 
         val calId = CALENDAR_ID via INT
@@ -38,6 +42,7 @@ class EventRepository {
         val begin = BEGIN via LONG
         val end = END via LONG
         val eventId = EVENT_ID via INT
+        // TODO: get cal owner to organize calendars
 
         override val projections: List<Projection> = listOf(calId, title, begin, end, eventId)
 
@@ -63,10 +68,22 @@ class EventRepository {
             val builder: Uri.Builder = CONTENT_URI.buildUpon()
             ContentUris.appendId(builder, startTime.timeInMillis)
             ContentUris.appendId(builder, endTime.timeInMillis)
-            // TODO: only query for selected calendars
             val contentResolver: ContentResolver = calarm.contentResolver
             // TODO: sort order
-            checkNotNull(contentResolver.query(builder.build(), keys, null, null, null))
+            checkNotNull(contentResolver.query(builder.build(), keys, getSelection(), null, null)).also {
+                Log.i(TAG, "found ${it.count} events")
+            }
+        }
+
+        private fun getSelection() = buildString {
+            append("(")
+            calIds.forEachIndexed { index, id ->
+                append("($CALENDAR_ID = $id)")
+                if (index != calIds.lastIndex) {
+                    append(" OR ")
+                }
+            }
+            append(")")
         }
 
     }
