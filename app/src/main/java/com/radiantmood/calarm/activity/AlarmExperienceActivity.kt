@@ -1,4 +1,4 @@
-package com.radiantmood.calarm
+package com.radiantmood.calarm.activity
 
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.lifecycleScope
+import com.radiantmood.calarm.AlarmExperienceViewModel
 import com.radiantmood.calarm.compose.render
 import com.radiantmood.calarm.screen.AlarmExperienceScreen
 

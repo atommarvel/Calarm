@@ -5,7 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import com.radiantmood.calarm.AlarmExperienceActivity
+import com.radiantmood.calarm.activity.AlarmExperienceActivity
 import com.radiantmood.calarm.calarm
 import com.radiantmood.calarm.repo.UserAlarm
 import java.io.Serializable
