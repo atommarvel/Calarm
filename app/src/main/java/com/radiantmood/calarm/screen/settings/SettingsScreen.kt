@@ -11,6 +11,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -18,25 +19,32 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.navigate
 import com.radiantmood.calarm.LocalAppBarTitle
-import com.radiantmood.calarm.LocalMainViewModel
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.screen.calendars.CalendarRow
 import com.radiantmood.calarm.screen.settings.SettingsScreenModel
+import com.radiantmood.calarm.screen.settings.SettingsViewModel
 import com.radiantmood.calarm.util.CalarmTopAppBar
+
+val LocalSettingsScreenViewModel = compositionLocalOf<SettingsViewModel> { error("No SettingsViewModel") }
 
 @Composable
 fun SettingsActivityScreen() {
-    LocalMainViewModel.current.getCalendarDisplays()
-    Providers(LocalAppBarTitle provides "Settings") {
+    val vm: SettingsViewModel = viewModel()
+    vm.getData()
+    Providers(
+        LocalAppBarTitle provides "Settings",
+        LocalSettingsScreenViewModel provides vm
+    ) {
         SettingsScreen()
     }
 }
 
 @Composable
 fun SettingsScreen() {
-    val screenModel: SettingsScreenModel by LocalMainViewModel.current.settingsScreen.observeAsState(SettingsScreenModel.getEmpty())
+    val screenModel: SettingsScreenModel by LocalSettingsScreenViewModel.current.settingsScreen.observeAsState(SettingsScreenModel.getEmpty())
     val navController = LocalNavController.current
     val hasSelectedCalendars = screenModel.selectedCalendars.isNotEmpty()
     Column {

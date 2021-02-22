@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -27,18 +28,27 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.navigate
-import com.radiantmood.calarm.*
+import com.radiantmood.calarm.BuildConfig
+import com.radiantmood.calarm.LocalAppBarTitle
+import com.radiantmood.calarm.LocalNavController
+import com.radiantmood.calarm.LocalPermissionsUtil
 import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.*
+
+val LocalEventsViewModel = compositionLocalOf<EventsViewModel> { error("No EventsViewModel") }
 
 @Composable
 fun EventsActivityScreen() {
     val navController = LocalNavController.current
     if (LocalPermissionsUtil.current.checkPermissions(navController)) return
-    val vm = LocalMainViewModel.current
-    vm.getEventDisplays()
-    Providers(LocalAppBarTitle provides "Events") {
+    val vm: EventsViewModel = viewModel()
+    vm.getData()
+    Providers(
+        LocalAppBarTitle provides "Events",
+        LocalEventsViewModel provides vm
+    ) {
         EventsScreen()
     }
 }
@@ -46,7 +56,7 @@ fun EventsActivityScreen() {
 @Composable
 fun EventsScreen() {
     val navController = LocalNavController.current
-    val vm = LocalMainViewModel.current
+    val vm = LocalEventsViewModel.current
     val screenModel: EventsScreenModel by vm.eventsScreen.observeAsState(EventsScreenModel.getEmpty())
 
     Column {
@@ -77,7 +87,7 @@ fun EventsScreen() {
 
 @Composable
 fun DebugAlarmButton() {
-    val vm = LocalMainViewModel.current
+    val vm = LocalEventsViewModel.current
     Button({
         val event = getDebugEvent(getFutureCalendar(secondsInFuture = 10))
         vm.scheduleAlarm(event.eventId, event.start, event.title)

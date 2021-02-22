@@ -11,32 +11,39 @@ import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.radiantmood.calarm.LocalAppBarTitle
-import com.radiantmood.calarm.LocalMainViewModel
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.LocalPermissionsUtil
 import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.CalarmTopAppBar
 import com.radiantmood.calarm.util.LoadingScreen
 
+val LocalCalendarsSelectionViewModel = compositionLocalOf<CalendarSelectionViewModel> { error("No CalendarSelectionViewModel") }
+
 @Composable
-fun CalendarsActivityScreen() {
+fun CalendarsSelectionActivityScreen() {
     val navController = LocalNavController.current
     if (LocalPermissionsUtil.current.checkPermissions(navController)) return
-    LocalMainViewModel.current.getCalendarDisplays()
-    Providers(LocalAppBarTitle provides "Select Calendars to use") {
-        CalendarsScreen()
+    val vm: CalendarSelectionViewModel = viewModel()
+    vm.getCalendarDisplays()
+    Providers(
+        LocalAppBarTitle provides "Select Calendars to use",
+        LocalCalendarsSelectionViewModel provides vm
+    ) {
+        CalendarsSelectionScreen()
     }
 }
 
 @Composable
-fun CalendarsScreen() {
-    val screenModel: CalendarScreenModel by LocalMainViewModel.current.calendarsScreen.observeAsState(CalendarScreenModel.getEmpty())
+fun CalendarsSelectionScreen() {
+    val screenModel: CalendarsSelectionScreenModel by LocalCalendarsSelectionViewModel.current.calendarsScreen.observeAsState(CalendarsSelectionScreenModel.getEmpty())
     Column {
         CalarmTopAppBar()
         // TODO: a filter to only show selected calendars
@@ -45,7 +52,7 @@ fun CalendarsScreen() {
 }
 
 @Composable
-fun CalendarScreenContent(screenModel: CalendarScreenModel) {
+fun CalendarScreenContent(screenModel: CalendarsSelectionScreenModel) {
     when (screenModel.state) {
         is LoadingState -> LoadingScreen()
         else -> CalendarList(screenModel.calendarSelectionModels)

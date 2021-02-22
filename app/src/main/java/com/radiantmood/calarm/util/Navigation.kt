@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.screen.PermissionScreen
 import com.radiantmood.calarm.screen.SettingsActivityScreen
-import com.radiantmood.calarm.screen.calendars.CalendarsActivityScreen
+import com.radiantmood.calarm.screen.calendars.CalendarsSelectionActivityScreen
 import com.radiantmood.calarm.screen.events.EventsActivityScreen
 
 
@@ -16,7 +16,7 @@ fun InitNavHost() {
     NavHost(navController, "alarms") {
         composable("alarms") { EventsActivityScreen() }
         composable("permission") { PermissionScreen() }
-        composable("calendars") { CalendarsActivityScreen() }
+        composable("calendars") { CalendarsSelectionActivityScreen() }
         composable("settings") { SettingsActivityScreen() }
     }
 }

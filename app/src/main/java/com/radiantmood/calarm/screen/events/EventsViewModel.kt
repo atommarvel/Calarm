@@ -1,20 +1,15 @@
-package com.radiantmood.calarm
+package com.radiantmood.calarm.screen.events
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.radiantmood.calarm.repo.*
+import com.radiantmood.calarm.repo.AlarmRepository
+import com.radiantmood.calarm.repo.EventRepository
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
+import com.radiantmood.calarm.repo.SelectedCalendarsRepository
+import com.radiantmood.calarm.repo.UserAlarm
 import com.radiantmood.calarm.screen.FinishedState
-import com.radiantmood.calarm.screen.calendars.CalendarScreenModel
-import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
-import com.radiantmood.calarm.screen.events.EventDisplay
-import com.radiantmood.calarm.screen.events.EventModel
-import com.radiantmood.calarm.screen.events.EventsScreenModel
-import com.radiantmood.calarm.screen.events.UnmappedAlarmModel
-import com.radiantmood.calarm.screen.settings.SettingsScreenModel
 import com.radiantmood.calarm.util.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -23,20 +18,13 @@ import java.util.concurrent.TimeUnit
 /**
  * TODO: split into multiple view models
  */
-class MainViewModel : ViewModel() {
-    private var _calendarsScreen = MutableLiveData(CalendarScreenModel.getEmpty())
-    val calendarsScreen: LiveData<CalendarScreenModel> = _calendarsScreen
-
+class EventsViewModel : ViewModel() {
     private var _eventsScreen = MutableLiveData(EventsScreenModel.getEmpty())
     val eventsScreen: LiveData<EventsScreenModel> = _eventsScreen
-
-    private var _settingsScreen = MutableLiveData(SettingsScreenModel.getEmpty())
-    val settingsScreen: LiveData<SettingsScreenModel> = _settingsScreen
 
     private var isDebugMode = false
 
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
-    private val calendarRepo = CalendarRepository()
     private val eventRepo = EventRepository()
 
     // TODO: group alarm classes into a manager?
@@ -45,7 +33,7 @@ class MainViewModel : ViewModel() {
 
     fun toggleDebug() {
         isDebugMode = !isDebugMode
-        getEventDisplays()
+        getData()
     }
 
     fun toggleAlarm(event: CalEvent) = viewModelScope.launch {
@@ -68,7 +56,7 @@ class MainViewModel : ViewModel() {
             val alarm = UserAlarm(eventId, start, title)
             alarmRepo.add(alarm)
             alarmUtil.scheduleAlarm(alarm)
-            getEventDisplays()
+            getData()
         }
     }
 
@@ -76,11 +64,11 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             alarmRepo.remove(alarm.eventId)
             alarmUtil.cancelAlarm(alarm)
-            getEventDisplays()
+            getData()
         }
     }
 
-    fun getEventDisplays() = viewModelScope.launch {
+    fun getData() = viewModelScope.launch {
         val selectedIds = selectedCalendarsRepo.getAll().toMutableList()
         if (isDebugMode) selectedIds.add(-1) // allow debug calendar
         val events = eventRepo.queryEvents().toMutableList()
@@ -96,7 +84,7 @@ class MainViewModel : ViewModel() {
             .map { createUnmappedAlarmModel(it) }
         val fullScreenMessage = when {
             selectedIds.isEmpty() -> "No calendars selected."
-            eventModels.isEmpty() -> "No events today!"
+            eventModels.isEmpty() && tmoEventModels.isEmpty() -> "No events today!"
             else -> null
         }
         _eventsScreen.postValue(EventsScreenModel(FinishedState, eventModels, tmoEventModels, unmappedAlarmModels, isDebugMode, fullScreenMessage))
@@ -109,7 +97,7 @@ class MainViewModel : ViewModel() {
         )
 
     private suspend fun createEventModel(event: CalEvent): EventModel {
-        val alarm = alarmRepo.getForEvent(event.eventId)
+        val alarm = alarmRepo.getForEvent(event.eventId) // TODO: reject alarm if it is 24 hr off (aka it's a daily recurring event)
         EventDisplay(event, alarm)
         val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
         val isAlarmSet = alarm != null
@@ -126,29 +114,5 @@ class MainViewModel : ViewModel() {
             onIncreaseOffset = ::updateAlarmOffset.bind(alarm, 1),
             onDecreaseOffset = ::updateAlarmOffset.bind(alarm, -1)
         )
-    }
-
-    fun getCalendarDisplays() = viewModelScope.launch {
-        postCalendarUpdate()
-    }
-
-    fun toggleSelectedCalendarId(id: Int) = viewModelScope.launch {
-        val ids = selectedCalendarsRepo.getAll()
-        if (ids.contains(id)) {
-            // TODO: should we cancel all related alarms?
-            selectedCalendarsRepo.remove(id)
-        } else selectedCalendarsRepo.add(id)
-        postCalendarUpdate()
-    }
-
-    private suspend fun postCalendarUpdate() {
-        _calendarsScreen.postValue(CalendarScreenModel(FinishedState, constructDisplays()))
-    }
-
-    private suspend fun constructDisplays(): List<CalendarSelectionModel> {
-        val selectedIds = selectedCalendarsRepo.getAll()
-        return calendarRepo.queryCalendars().map { userCal ->
-            CalendarSelectionModel(userCal.name, selectedIds.contains(userCal.id), Color(userCal.colorInt), ::toggleSelectedCalendarId.bind(userCal.id))
-        }
     }
 }
