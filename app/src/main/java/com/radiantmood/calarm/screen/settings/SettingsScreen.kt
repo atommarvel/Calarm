@@ -63,6 +63,7 @@ fun SettingsScreen() {
             }
             val label = if (hasSelectedCalendars) "View More Calendars" else "Select Calendars" // TODO: to vm
             item {
+                // TODO: make a settings row
                 Button(onClick = { navController.navigate("calendars") }) {
                     Text(label, modifier = Modifier.padding(12.dp))
                 }

@@ -2,6 +2,7 @@ package com.radiantmood.calarm.util
 
 import com.radiantmood.calarm.calarm
 
+// TODO: use
 sealed class TextResource {
     abstract fun asString(): CharSequence
 }
