@@ -15,9 +15,6 @@ import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-/**
- * TODO: split into multiple view models
- */
 class EventsViewModel : ViewModel() {
     private var _eventsScreen = MutableLiveData(EventsScreenModel.getEmpty())
     val eventsScreen: LiveData<EventsScreenModel> = _eventsScreen
