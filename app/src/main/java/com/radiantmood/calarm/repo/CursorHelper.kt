@@ -3,6 +3,8 @@ package com.radiantmood.calarm.repo
 import android.database.Cursor
 import com.radiantmood.calarm.repo.CursorValueType.*
 
+// TODO: document file
+
 interface CursorCreator {
     val cursor: Cursor
 }

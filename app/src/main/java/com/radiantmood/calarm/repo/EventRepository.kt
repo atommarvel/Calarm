@@ -18,6 +18,8 @@ import java.util.concurrent.TimeUnit
 
 class EventRepository {
 
+    data class CalEvent(val calId: Int, val eventId: Int, val title: String, val start: Calendar, val end: Calendar)
+
     @WorkerThread
     suspend fun queryEvents(calIds: List<Int> = emptyList()): List<CalEvent> = EventCursor(calIds = calIds).map { it }.sortedBy { it.start }
 
@@ -87,6 +89,4 @@ class EventRepository {
         }
 
     }
-
-    data class CalEvent(val calId: Int, val eventId: Int, val title: String, val start: Calendar, val end: Calendar)
 }

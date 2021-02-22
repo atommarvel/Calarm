@@ -5,8 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.radiantmood.calarm.util.InitNavHost
+import com.radiantmood.calarm.screen.PermissionScreen
+import com.radiantmood.calarm.screen.calendars.CalendarsSelectionActivityScreen
+import com.radiantmood.calarm.screen.events.EventsActivityScreen
+import com.radiantmood.calarm.screen.settings.SettingsActivityScreen
 import com.radiantmood.calarm.util.PermissionsUtil
 
 val LocalPermissionsUtil = compositionLocalOf<PermissionsUtil> { error("No PermissionsKit") }
@@ -21,6 +26,12 @@ fun App(activity: ComponentActivity) {
         LocalPermissionsUtil provides permissions,
         LocalNavController provides navController
     ) {
-        InitNavHost()
+        val navController = LocalNavController.current
+        NavHost(navController, "alarms") {
+            composable("alarms") { EventsActivityScreen() }
+            composable("permission") { PermissionScreen() }
+            composable("calendars") { CalendarsSelectionActivityScreen() }
+            composable("settings") { SettingsActivityScreen() }
+        }
     }
 }

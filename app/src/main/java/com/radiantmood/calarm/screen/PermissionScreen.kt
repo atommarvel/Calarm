@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.LocalPermissionsUtil
-import com.radiantmood.calarm.util.Fullscreen
+import com.radiantmood.calarm.compose.Fullscreen
 import com.radiantmood.calarm.util.PermissionsUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

@@ -3,7 +3,7 @@ package com.radiantmood.calarm
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.radiantmood.calarm.util.render
+import com.radiantmood.calarm.compose.render
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,4 +1,4 @@
-package com.radiantmood.calarm.screen
+package com.radiantmood.calarm.screen.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,12 +23,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.navigate
 import com.radiantmood.calarm.LocalAppBarTitle
 import com.radiantmood.calarm.LocalNavController
+import com.radiantmood.calarm.compose.CalarmTopAppBar
 import com.radiantmood.calarm.screen.calendars.CalendarRow
-import com.radiantmood.calarm.screen.settings.SettingsScreenModel
-import com.radiantmood.calarm.screen.settings.SettingsViewModel
-import com.radiantmood.calarm.util.CalarmTopAppBar
 
 val LocalSettingsScreenViewModel = compositionLocalOf<SettingsViewModel> { error("No SettingsViewModel") }
+
+// TODO: @previews on each screen file
 
 @Composable
 fun SettingsActivityScreen() {

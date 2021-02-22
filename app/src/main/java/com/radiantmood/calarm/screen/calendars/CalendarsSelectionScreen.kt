@@ -21,9 +21,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.radiantmood.calarm.LocalAppBarTitle
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.LocalPermissionsUtil
+import com.radiantmood.calarm.compose.CalarmTopAppBar
+import com.radiantmood.calarm.compose.LoadingScreen
 import com.radiantmood.calarm.screen.LoadingState
-import com.radiantmood.calarm.util.CalarmTopAppBar
-import com.radiantmood.calarm.util.LoadingScreen
 
 val LocalCalendarsSelectionViewModel = compositionLocalOf<CalendarSelectionViewModel> { error("No CalendarSelectionViewModel") }
 

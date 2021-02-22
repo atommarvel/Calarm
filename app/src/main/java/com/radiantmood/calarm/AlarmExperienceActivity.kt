@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.lifecycleScope
+import com.radiantmood.calarm.compose.render
 import com.radiantmood.calarm.screen.AlarmExperienceScreen
-import com.radiantmood.calarm.util.render
 
 
 class AlarmExperienceActivity : AppCompatActivity() {

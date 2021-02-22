@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
@@ -24,8 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,8 +31,10 @@ import com.radiantmood.calarm.BuildConfig
 import com.radiantmood.calarm.LocalAppBarTitle
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.LocalPermissionsUtil
+import com.radiantmood.calarm.compose.*
 import com.radiantmood.calarm.screen.LoadingState
-import com.radiantmood.calarm.util.*
+import com.radiantmood.calarm.util.getDebugEvent
+import com.radiantmood.calarm.util.getFutureCalendar
 
 val LocalEventsViewModel = compositionLocalOf<EventsViewModel> { error("No EventsViewModel") }
 
@@ -117,14 +116,6 @@ fun EventsList(eventList: List<EventModel>, tmoEventList: List<EventModel>, alar
         items(alarmList) { unmappedAlarm ->
             UnmappedAlarmRow(unmappedAlarm)
             Divider()
-        }
-    }
-}
-
-fun LazyListScope.SectionTitle(shouldShow: Boolean, title: String) {
-    if (shouldShow) {
-        item {
-            Text(title, fontSize = 24.sp, modifier = Modifier.padding(12.dp), style = TextStyle(textDecoration = TextDecoration.Underline))
         }
     }
 }
