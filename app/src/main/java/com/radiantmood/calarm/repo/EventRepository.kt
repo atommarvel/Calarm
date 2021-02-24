@@ -21,16 +21,20 @@ class EventRepository {
     data class CalEvent(val calId: Int, val eventId: Int, val title: String, val start: Calendar, val end: Calendar)
 
     @WorkerThread
-    suspend fun queryEvents(calIds: List<Int> = emptyList()): List<CalEvent> = EventCursor(calIds = calIds).map { it }.sortedBy { it.start }
+    suspend fun queryEvents(calIds: List<Int> = emptyList()): List<CalEvent> {
+        val today = Calendar.getInstance().atStartOfDay()
+        return EventCursor(calIds = calIds).map { it }.filter { !it.start.before(today) }.sortedBy { it.start }
+    }
 
     @WorkerThread
     suspend fun queryTomorrowsEvents(calIds: List<Int> = emptyList()): List<CalEvent> {
         val tmoMillis = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1)
+        val tmo = CalendarAtTime(tmoMillis).atStartOfDay()
         return EventCursor(
-            startTime = CalendarAtTime(tmoMillis).atStartOfDay(),
+            startTime = tmo,
             endTime = CalendarAtTime(tmoMillis).atEndOfDay(),
             calIds = calIds
-        ).map { it }.sortedBy { it.start }
+        ).map { it }.filter { !it.start.before(tmo) }.sortedBy { it.start }
     }
 
     class EventCursor(

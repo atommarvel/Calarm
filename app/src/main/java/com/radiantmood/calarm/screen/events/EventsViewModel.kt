@@ -74,8 +74,8 @@ class EventsViewModel : ViewModel() {
             tmoEvents.forEach { add(it.eventId) }
         }.toList()
         if (isDebugMode) events.add(0, getDebugEvent()) // add debug event to top
-        val eventModels = events.filter { selectedIds.contains(it.calId) }.map { createEventModel(it) }
-        val tmoEventModels = tmoEvents.filter { selectedIds.contains(it.calId) }.map { createEventModel(it) }
+        val eventModels = events.map { createEventModel(it) }
+        val tmoEventModels = tmoEvents.map { createEventModel(it) }
         val unmappedAlarmModels = alarmRepo.queryAlarms()
             .filter { !eventIds.contains(it.eventId) }
             .map { createUnmappedAlarmModel(it) }
