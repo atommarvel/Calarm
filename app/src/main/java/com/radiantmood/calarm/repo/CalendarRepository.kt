@@ -13,6 +13,8 @@ import com.radiantmood.calarm.repo.CursorValueType.STRING
 
 class CalendarRepository {
 
+    data class UserCal(val id: Int, val name: String, val colorInt: Int, val owner: String)
+
     @WorkerThread
     suspend fun queryCalendars(): List<UserCal> = NewCalendarCursor().map { it }
 
@@ -20,14 +22,17 @@ class CalendarRepository {
         val id = _ID via INT
         val name = CALENDAR_DISPLAY_NAME via STRING
         val color = CALENDAR_COLOR via INT
+        val owner = OWNER_ACCOUNT via STRING
+        // TODO: get cal owner to organize calendars
 
-        override val projections: List<Projection> = listOf(id, name, color)
+        override val projections: List<Projection> = listOf(id, name, color, owner)
 
         override fun assemble(cursor: Cursor): UserCal =
             UserCal(
                 id = this[id],
                 name = this[name],
-                colorInt = this[color]
+                colorInt = this[color],
+                owner = this[owner]
             )
 
         override val cursor: Cursor by lazy {
@@ -36,11 +41,4 @@ class CalendarRepository {
             checkNotNull(contentResolver.query(builder.build(), keys, null, null, null))
         }
     }
-
-    interface ICal {
-        val id: Int
-        val name: String
-    }
-
-    data class UserCal(override val id: Int, override val name: String, val colorInt: Int) : ICal
 }

@@ -48,7 +48,7 @@ class EventRepository {
         val begin = BEGIN via LONG
         val end = END via LONG
         val eventId = EVENT_ID via INT
-        // TODO: get cal owner to organize calendars
+        // TODO: add calendar color
 
         override val projections: List<Projection> = listOf(calId, title, begin, end, eventId)
 
