@@ -52,5 +52,6 @@ class AlarmUtil {
 
     // TODO: reconcile all alarms to their events to make sure there are no unmatched alarms due to event changes
     // is there a way to listen for updates in calendar events? sync adapters?
+
     // TODO: delete alarms when they go off
 }
