@@ -82,14 +82,16 @@ class EventRepository {
         }
 
         private fun getSelection() = buildString {
-            append("(")
-            calIds.forEachIndexed { index, id ->
-                append("($CALENDAR_ID = $id)")
-                if (index != calIds.lastIndex) {
-                    append(" OR ")
+            if (calIds.isNotEmpty()) {
+                append("(")
+                calIds.forEachIndexed { index, id ->
+                    append("($CALENDAR_ID = $id)")
+                    if (index != calIds.lastIndex) {
+                        append(" OR ")
+                    }
                 }
+                append(")")
             }
-            append(")")
         }
 
     }
