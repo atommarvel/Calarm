@@ -1,21 +1,14 @@
 package com.radiantmood.calarm.screen.events
 
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.Divider
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.compositionLocalOf
@@ -103,19 +96,23 @@ fun MessageScreen(message: String) = Fullscreen {
 @Composable
 fun EventsList(eventList: List<EventModel>, tmoEventList: List<EventModel>, alarmList: List<UnmappedAlarmModel>) {
     LazyColumn {
+        SectionTitle(eventList.isNotEmpty(), "Today's Events")
         items(eventList) { event ->
             EventRow(event)
-            Divider()
+            if (!event.doesNextEventOverlap) {
+                Divider()
+            }
         }
         SectionTitle(tmoEventList.isNotEmpty(), "Tomorrow's Events")
         items(tmoEventList) { event ->
             EventRow(event)
-            Divider()
+            if (!event.doesNextEventOverlap) {
+                Divider()
+            }
         }
         SectionTitle(alarmList.isNotEmpty(), "Unmapped Alarms")
         items(alarmList) { unmappedAlarm ->
             UnmappedAlarmRow(unmappedAlarm)
-            Divider()
         }
     }
 }
@@ -144,7 +141,13 @@ fun EventRow(event: EventModel) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .background(event.calColor, CircleShape)
+                        .size(12.dp)
+                )
+                Spacer(modifier = Modifier.size(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(event.eventName, fontSize = 18.sp)
                     Text(event.timeRange)
@@ -152,7 +155,14 @@ fun EventRow(event: EventModel) {
                 if (event.isAlarmSet) {
                     OffsetView(Modifier.weight(1f), event)
                 }
-                Switch(checked = event.isAlarmSet, onCheckedChange = { event.onToggleAlarm() })
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    IconButton(onClick = { event.onToggleAlarm() }) {
+                        val img = if (event.isAlarmSet) Icons.Default.AlarmOn else Icons.Default.AlarmOff
+                        val tint = if (event.isAlarmSet) MaterialTheme.colors.primary else MaterialTheme.colors.onBackground.copy(alpha = .3f)
+                        // TODO: package tint and imagevector and onClick into a CalarmIconButton model and deliver from the viewmodel
+                        Icon(img, null, tint = tint) // TODO: null
+                    }
+                }
             }
             event.debugData?.let {
                 Text(it)

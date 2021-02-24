@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 class EventRepository {
 
-    data class CalEvent(val calId: Int, val eventId: Int, val title: String, val start: Calendar, val end: Calendar)
+    data class CalEvent(val calId: Int, val eventId: Int, val title: String, val start: Calendar, val end: Calendar, val calColorInt: Int)
 
     @WorkerThread
     suspend fun queryEvents(calIds: List<Int> = emptyList()): List<CalEvent> {
@@ -48,9 +48,10 @@ class EventRepository {
         val begin = BEGIN via LONG
         val end = END via LONG
         val eventId = EVENT_ID via INT
+        val color = CALENDAR_COLOR via INT
         // TODO: add calendar color
 
-        override val projections: List<Projection> = listOf(calId, title, begin, end, eventId)
+        override val projections: List<Projection> = listOf(calId, title, begin, end, eventId, color)
 
         override fun assemble(cursor: Cursor): CalEvent {
             val calStart = CalendarAtTime(this[begin])
@@ -60,7 +61,8 @@ class EventRepository {
                 eventId = this[eventId],
                 title = this[title],
                 start = calStart,
-                end = calEnd
+                end = calEnd,
+                calColorInt = this[color]
             )
         }
 

@@ -1,5 +1,6 @@
 package com.radiantmood.calarm.screen.events
 
+import androidx.compose.ui.graphics.Color
 import com.radiantmood.calarm.repo.EventRepository
 import com.radiantmood.calarm.repo.UserAlarm
 import com.radiantmood.calarm.screen.LoadingState
@@ -12,6 +13,8 @@ data class EventModel(
     val timeRange: String,
     val isAlarmSet: Boolean,
     val alarmOffset: Int,
+    val calColor: Color,
+    val doesNextEventOverlap: Boolean,
     val debugData: String? = null,
     val onToggleAlarm: () -> Unit,
     val onIncreaseOffset: () -> Unit,

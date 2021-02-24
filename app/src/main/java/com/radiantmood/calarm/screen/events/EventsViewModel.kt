@@ -1,5 +1,6 @@
 package com.radiantmood.calarm.screen.events
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -74,7 +75,7 @@ class EventsViewModel : ViewModel() {
             tmoEvents.forEach { add(it.eventId) }
         }.toList()
         if (isDebugMode) events.add(0, getDebugEvent()) // add debug event to top
-        val eventModels = events.map { createEventModel(it) }
+        val eventModels = events.mapIndexed { index, event -> createEventModel(event, events.getOrNull(index + 1)) }
         val tmoEventModels = tmoEvents.map { createEventModel(it) }
         val unmappedAlarmModels = alarmRepo.queryAlarms()
             .filter { !eventIds.contains(it.eventId) }
@@ -93,7 +94,7 @@ class EventsViewModel : ViewModel() {
             onRemoveAlarm = ::cancelAlarm.bind(it)
         )
 
-    private suspend fun createEventModel(event: CalEvent): EventModel {
+    private suspend fun createEventModel(event: CalEvent, nextEvent: CalEvent? = null): EventModel {
         val alarm = alarmRepo.getForEvent(event.eventId) // TODO: reject alarm if it is 24 hr off (aka it's a daily recurring event)
         EventDisplay(event, alarm)
         val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
@@ -101,11 +102,16 @@ class EventsViewModel : ViewModel() {
         val offsetMillis = (alarm?.calendar?.timeInMillis ?: 0) - event.start.timeInMillis
         val offsetMinutes = TimeUnit.MILLISECONDS.toMinutes(offsetMillis)
         val debugData = if (isDebugMode) "eventId: ${event.eventId}" else null
+        val doesNextEventOverlap = if (nextEvent != null) {
+            event.end.after(nextEvent.start)
+        } else false
         return EventModel(
             eventName = event.title,
             timeRange = timeRange,
             isAlarmSet = isAlarmSet,
             alarmOffset = offsetMinutes.toInt(),
+            calColor = Color(event.calColorInt),
+            doesNextEventOverlap = doesNextEventOverlap,
             debugData = debugData,
             onToggleAlarm = ::toggleAlarm.bind(event),
             onIncreaseOffset = ::updateAlarmOffset.bind(alarm, 1),

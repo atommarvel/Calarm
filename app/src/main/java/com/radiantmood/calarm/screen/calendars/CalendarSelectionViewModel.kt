@@ -1,6 +1,5 @@
 package com.radiantmood.calarm.screen.calendars
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.radiantmood.calarm.repo.CalendarRepository
 import com.radiantmood.calarm.repo.SelectedCalendarsRepository
 import com.radiantmood.calarm.screen.FinishedState
-import com.radiantmood.calarm.util.TAG
 import com.radiantmood.calarm.util.bind
 import kotlinx.coroutines.launch
 
@@ -27,7 +25,6 @@ class CalendarSelectionViewModel : ViewModel() {
     private suspend fun constructDisplays(): List<CalendarSelectionModel> {
         val selectedIds = selectedCalendarsRepo.getAll()
         return calendarRepo.queryCalendars().map { userCal ->
-            Log.i(TAG, "constructDisplays: ${userCal.owner}")
             CalendarSelectionModel(userCal.name, selectedIds.contains(userCal.id), Color(userCal.colorInt), ::toggleSelectedCalendarId.bind(userCal.id))
         }
     }
