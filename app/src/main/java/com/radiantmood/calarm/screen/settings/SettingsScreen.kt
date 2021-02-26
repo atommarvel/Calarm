@@ -33,7 +33,7 @@ import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
 
 val LocalSettingsScreenViewModel = compositionLocalOf<SettingsViewModel> { error("No SettingsViewModel") }
 
-// TODO: @previews on each screen file
+// TODO: @previews on each screen file... or a single preview file?
 
 @Composable
 fun SettingsScreenRoot() {
