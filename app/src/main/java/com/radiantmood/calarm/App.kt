@@ -13,6 +13,9 @@ val LocalPermissionsUtil = compositionLocalOf<PermissionsUtil> { error("No Permi
 val LocalNavController = compositionLocalOf<NavHostController> { error("No NavController") }
 val LocalAppBarTitle = compositionLocalOf<String> { error("No AppBarTitle") }
 
+/**
+ * TODO: animate screen navigation
+ */
 @Composable
 fun App(activity: ComponentActivity) {
     CompositionLocalProvider(
