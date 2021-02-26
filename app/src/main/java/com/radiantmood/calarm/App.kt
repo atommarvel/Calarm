@@ -15,14 +15,11 @@ val LocalAppBarTitle = compositionLocalOf<String> { error("No AppBarTitle") }
 
 @Composable
 fun App(activity: ComponentActivity) {
-    val permissions = PermissionsUtil(activity)
-    val navController = rememberNavController()
     CompositionLocalProvider(
-        LocalPermissionsUtil provides permissions,
-        LocalNavController provides navController
+        LocalPermissionsUtil provides PermissionsUtil(activity),
+        LocalNavController provides rememberNavController()
     ) {
-        val navController = LocalNavController.current //TODO: Screens
-        NavHost(navController, EventsScreen.route) {
+        NavHost(LocalNavController.current, EventsScreen.route) {
             composableScreen(EventsScreen)
             composableScreen(PermissionsScreen)
             composableScreen(CalendarSelectionScreen)

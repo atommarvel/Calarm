@@ -27,7 +27,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.radiantmood.calarm.*
 import com.radiantmood.calarm.compose.*
-import com.radiantmood.calarm.screen.LoadingState
+import com.radiantmood.calarm.screen.LoadingModelContainer
+import com.radiantmood.calarm.screen.ModelContainer
 import com.radiantmood.calarm.util.getDebugEvent
 import com.radiantmood.calarm.util.getFutureCalendar
 
@@ -40,7 +41,7 @@ fun EventsScreenRoot() {
     val vm: EventsViewModel = viewModel()
     vm.getData()
     CompositionLocalProvider(
-        LocalAppBarTitle provides "Events",
+        LocalAppBarTitle provides "Events", // TODO: Strings -> resource ids
         LocalEventsViewModel provides vm
     ) {
         EventsScreen()
@@ -51,10 +52,9 @@ fun EventsScreenRoot() {
 fun EventsScreen() {
     val navController = LocalNavController.current
     val vm = LocalEventsViewModel.current
-    val screenModel: EventsScreenModel by vm.eventsScreen.observeAsState(EventsScreenModel.getEmpty())
+    val modelContainer: ModelContainer<EventsScreenModel> by vm.eventsScreen.observeAsState(LoadingModelContainer())
 
     Column {
-        // TODO: Strings -> resource ids
         // TODO: Scaffold
         CalarmTopAppBar(actions = {
             // TODO: add a quick way to get to calendar app
@@ -69,15 +69,23 @@ fun EventsScreen() {
                 navController.navigate(SettingsScreen)
             }
         })
-        if (screenModel.showDebugAlarmButton) DebugAlarmButton()
-        when {
-            screenModel.state is LoadingState -> LoadingScreen()
-            !screenModel.fullScreenMessage.isNullOrBlank() -> MessageScreen(screenModel.fullScreenMessage!!)
-            else -> EventsList(screenModel.eventModels, screenModel.tmoEventModels, screenModel.unmappedAlarms)
+
+        ModelContainerContent(modelContainer) { screenModel ->
+            when (screenModel) {
+                is EventsScreenModel.Eventful -> EventfulEventsScreen(screenModel)
+                is EventsScreenModel.FullscreenMessage -> Fullscreen { Text(screenModel.message) }
+            }
         }
     }
 }
 
+@Composable
+fun EventfulEventsScreen(screenModel: EventsScreenModel.Eventful) {
+    if (screenModel.showDebugAlarmButton) DebugAlarmButton()
+    EventsList(screenModel.eventModels, screenModel.tmoEventModels, screenModel.unmappedAlarms)
+}
+
+// TODO: move to settings screen
 @Composable
 fun DebugAlarmButton() {
     val vm = LocalEventsViewModel.current
@@ -87,11 +95,6 @@ fun DebugAlarmButton() {
     }) {
         Text("Schedule alarm 20 seconds from now")
     }
-}
-
-@Composable
-fun MessageScreen(message: String) = Fullscreen {
-    Text(message)
 }
 
 @Composable

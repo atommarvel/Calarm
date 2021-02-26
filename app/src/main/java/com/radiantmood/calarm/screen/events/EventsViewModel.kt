@@ -10,15 +10,16 @@ import com.radiantmood.calarm.repo.EventRepository
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
 import com.radiantmood.calarm.repo.SelectedCalendarsRepository
 import com.radiantmood.calarm.repo.UserAlarm
-import com.radiantmood.calarm.screen.FinishedState
+import com.radiantmood.calarm.screen.LoadingModelContainer
+import com.radiantmood.calarm.screen.ModelContainer
 import com.radiantmood.calarm.util.*
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class EventsViewModel : ViewModel() {
-    private var _eventsScreen = MutableLiveData(EventsScreenModel.getEmpty())
-    val eventsScreen: LiveData<EventsScreenModel> = _eventsScreen
+    private var _eventsScreen = MutableLiveData<ModelContainer<EventsScreenModel>>(LoadingModelContainer())
+    val eventsScreen: LiveData<ModelContainer<EventsScreenModel>> = _eventsScreen
 
     private var isDebugMode = false
 
@@ -94,7 +95,13 @@ class EventsViewModel : ViewModel() {
             eventModels.isEmpty() && tmoEventModels.isEmpty() -> "No events today!"
             else -> null
         }
-        _eventsScreen.postValue(EventsScreenModel(FinishedState, eventModels, tmoEventModels, unmappedAlarmModels, isDebugMode, fullScreenMessage))
+        val model = fullScreenMessage?.let { EventsScreenModel.FullscreenMessage(it) } ?: EventsScreenModel.Eventful(
+            eventModels,
+            tmoEventModels,
+            unmappedAlarmModels,
+            isDebugMode
+        )
+        _eventsScreen.postValue(model)
     }
 
     private fun createUnmappedAlarmModel(it: UserAlarm) =
