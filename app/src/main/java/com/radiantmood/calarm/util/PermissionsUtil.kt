@@ -9,8 +9,9 @@ import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import androidx.navigation.compose.navigate
 import com.markodevcic.peko.Peko
+import com.radiantmood.calarm.PermissionsScreen
+import com.radiantmood.calarm.navigate
 
 class PermissionsUtil(private val activity: Activity) {
 
@@ -34,7 +35,7 @@ class PermissionsUtil(private val activity: Activity) {
     fun isOverlayPermissionGranted(): Boolean = Settings.canDrawOverlays(activity)
 
     fun checkPermissions(navController: NavController): Boolean = if (!arePermissionsGranted()) {
-        navController.navigate("permission")
+        navController.navigate(PermissionsScreen)
         true
     } else false
 }

@@ -28,7 +28,7 @@ import com.radiantmood.calarm.screen.LoadingState
 val LocalCalendarsSelectionViewModel = compositionLocalOf<CalendarSelectionViewModel> { error("No CalendarSelectionViewModel") }
 
 @Composable
-fun CalendarsSelectionActivityScreen() {
+fun CalendarsSelectionScreenRoot() {
     val navController = LocalNavController.current
     if (LocalPermissionsUtil.current.checkPermissions(navController)) return
     val vm: CalendarSelectionViewModel = viewModel()
