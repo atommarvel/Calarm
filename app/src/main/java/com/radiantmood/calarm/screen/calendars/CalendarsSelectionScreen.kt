@@ -22,8 +22,9 @@ import com.radiantmood.calarm.LocalAppBarTitle
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.LocalPermissionsUtil
 import com.radiantmood.calarm.compose.CalarmTopAppBar
-import com.radiantmood.calarm.compose.LoadingScreen
-import com.radiantmood.calarm.screen.LoadingState
+import com.radiantmood.calarm.compose.ModelContainerContent
+import com.radiantmood.calarm.screen.LoadingModelContainer
+import com.radiantmood.calarm.screen.ModelContainer
 
 val LocalCalendarsSelectionViewModel = compositionLocalOf<CalendarSelectionViewModel> { error("No CalendarSelectionViewModel") }
 
@@ -43,19 +44,13 @@ fun CalendarsSelectionScreenRoot() {
 
 @Composable
 fun CalendarsSelectionScreen() {
-    val screenModel: CalendarsSelectionScreenModel by LocalCalendarsSelectionViewModel.current.calendarsScreen.observeAsState(CalendarsSelectionScreenModel.getEmpty())
+    val vm = LocalCalendarsSelectionViewModel.current
+    val modelContainer: ModelContainer<CalendarsSelectionScreenModel> by vm.calendarsScreen.observeAsState(LoadingModelContainer())
     Column {
         CalarmTopAppBar()
-        // TODO: a filter to only show selected calendars
-        CalendarScreenContent(screenModel)
-    }
-}
-
-@Composable
-fun CalendarScreenContent(screenModel: CalendarsSelectionScreenModel) {
-    when (screenModel.state) {
-        is LoadingState -> LoadingScreen()
-        else -> CalendarList(screenModel.calendarSelectionModels)
+        ModelContainerContent(modelContainer) { screenModel ->
+            CalendarList(screenModel.calendarSelectionModels)
+        }
     }
 }
 

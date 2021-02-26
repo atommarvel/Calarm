@@ -7,14 +7,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.radiantmood.calarm.repo.CalendarRepository
 import com.radiantmood.calarm.repo.SelectedCalendarsRepository
+import com.radiantmood.calarm.screen.LoadingModelContainer
+import com.radiantmood.calarm.screen.ModelContainer
 import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
 import com.radiantmood.calarm.util.bind
 import kotlinx.coroutines.launch
 
 class SettingsViewModel : ViewModel() {
 
-    private var _settingsScreen = MutableLiveData(SettingsScreenModel.getEmpty())
-    val settingsScreen: LiveData<SettingsScreenModel> = _settingsScreen
+    private var _settingsScreen = MutableLiveData<ModelContainer<SettingsScreenModel>>(LoadingModelContainer())
+    val settingsScreen: LiveData<ModelContainer<SettingsScreenModel>> = _settingsScreen
 
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
     private val calendarRepo = CalendarRepository()
