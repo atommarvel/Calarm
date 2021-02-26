@@ -10,7 +10,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -34,7 +34,7 @@ val LocalSettingsScreenViewModel = compositionLocalOf<SettingsViewModel> { error
 fun SettingsActivityScreen() {
     val vm: SettingsViewModel = viewModel()
     vm.getData()
-    Providers(
+    CompositionLocalProvider(
         LocalAppBarTitle provides "Settings",
         LocalSettingsScreenViewModel provides vm
     ) {

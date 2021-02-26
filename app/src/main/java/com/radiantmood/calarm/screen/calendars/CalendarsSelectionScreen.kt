@@ -10,7 +10,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,7 +33,7 @@ fun CalendarsSelectionActivityScreen() {
     if (LocalPermissionsUtil.current.checkPermissions(navController)) return
     val vm: CalendarSelectionViewModel = viewModel()
     vm.getCalendarDisplays()
-    Providers(
+    CompositionLocalProvider(
         LocalAppBarTitle provides "Select Calendars to use",
         LocalCalendarsSelectionViewModel provides vm
     ) {

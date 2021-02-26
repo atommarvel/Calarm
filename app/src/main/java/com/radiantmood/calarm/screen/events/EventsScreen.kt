@@ -6,11 +6,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Divider
+import androidx.compose.material.Switch
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -37,7 +43,7 @@ fun EventsActivityScreen() {
     if (LocalPermissionsUtil.current.checkPermissions(navController)) return
     val vm: EventsViewModel = viewModel()
     vm.getData()
-    Providers(
+    CompositionLocalProvider(
         LocalAppBarTitle provides "Events",
         LocalEventsViewModel provides vm
     ) {
@@ -155,14 +161,7 @@ fun EventRow(event: EventModel) {
                 if (event.isAlarmSet) {
                     OffsetView(Modifier.weight(1f), event)
                 }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    IconButton(onClick = { event.onToggleAlarm() }) {
-                        val img = if (event.isAlarmSet) Icons.Default.AlarmOn else Icons.Default.AlarmOff
-                        val tint = if (event.isAlarmSet) MaterialTheme.colors.primary else MaterialTheme.colors.onBackground.copy(alpha = .3f)
-                        // TODO: package tint and imagevector and onClick into a CalarmIconButton model and deliver from the viewmodel
-                        Icon(img, null, tint = tint) // TODO: null
-                    }
-                }
+                Switch(checked = event.isAlarmSet, onCheckedChange = { event.onToggleAlarm })
             }
             event.debugData?.let {
                 Text(it)

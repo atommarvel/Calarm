@@ -2,7 +2,7 @@ package com.radiantmood.calarm
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -22,11 +22,11 @@ val LocalAppBarTitle = compositionLocalOf<String> { error("No AppBarTitle") }
 fun App(activity: ComponentActivity) {
     val permissions = PermissionsUtil(activity)
     val navController = rememberNavController()
-    Providers(
+    CompositionLocalProvider(
         LocalPermissionsUtil provides permissions,
         LocalNavController provides navController
     ) {
-        val navController = LocalNavController.current
+        val navController = LocalNavController.current //TODO: Screens
         NavHost(navController, "alarms") {
             composable("alarms") { EventsActivityScreen() }
             composable("permission") { PermissionScreen() }

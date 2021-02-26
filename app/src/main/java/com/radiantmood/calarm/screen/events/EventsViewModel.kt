@@ -75,8 +75,17 @@ class EventsViewModel : ViewModel() {
             tmoEvents.forEach { add(it.eventId) }
         }.toList()
         if (isDebugMode) events.add(0, getDebugEvent()) // add debug event to top
-        val eventModels = events.mapIndexed { index, event -> createEventModel(event, events.getOrNull(index + 1)) }
-        val tmoEventModels = tmoEvents.map { createEventModel(it) }
+        val processedEventIds = mutableSetOf<Int>()
+        val eventModels = events.mapIndexed { index, event ->
+            val previouslyProcessed = processedEventIds.contains(event.eventId)
+            processedEventIds.add(event.eventId)
+            createEventModel(event, events.getOrNull(index + 1), previouslyProcessed)
+        }
+        val tmoEventModels = tmoEvents.mapIndexed { index, event ->
+            val previouslyProcessed = processedEventIds.contains(event.eventId)
+            processedEventIds.add(event.eventId)
+            createEventModel(event, tmoEvents.getOrNull(index + 1), previouslyProcessed)
+        }
         val unmappedAlarmModels = alarmRepo.queryAlarms()
             .filter { !eventIds.contains(it.eventId) }
             .map { createUnmappedAlarmModel(it) }
@@ -94,8 +103,9 @@ class EventsViewModel : ViewModel() {
             onRemoveAlarm = ::cancelAlarm.bind(it)
         )
 
-    private suspend fun createEventModel(event: CalEvent, nextEvent: CalEvent? = null): EventModel {
-        val alarm = alarmRepo.getForEvent(event.eventId) // TODO: reject alarm if it is 24 hr off (aka it's a daily recurring event)
+    private suspend fun createEventModel(event: CalEvent, nextEvent: CalEvent? = null, previouslyProcessed: Boolean = false): EventModel {
+        val alarm =
+            if (previouslyProcessed) alarmRepo.getForEvent(event.eventId) else null // TODO: reject alarm if it is 24 hr off (aka it's a daily recurring event)
         EventDisplay(event, alarm)
         val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
         val isAlarmSet = alarm != null
