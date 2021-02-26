@@ -105,7 +105,7 @@ class EventsViewModel : ViewModel() {
 
     private suspend fun createEventModel(event: CalEvent, nextEvent: CalEvent? = null, previouslyProcessed: Boolean = false): EventModel {
         val alarm =
-            if (previouslyProcessed) alarmRepo.getForEvent(event.eventId) else null // TODO: reject alarm if it is 24 hr off (aka it's a daily recurring event)
+            if (!previouslyProcessed) alarmRepo.getForEvent(event.eventId) else null // TODO: reject alarm if it is 24 hr off (aka it's a daily recurring event)
         EventDisplay(event, alarm)
         val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
         val isAlarmSet = alarm != null

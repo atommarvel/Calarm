@@ -20,10 +20,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.navigate
+import com.radiantmood.calarm.CalendarSelectionScreen
 import com.radiantmood.calarm.LocalAppBarTitle
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.compose.CalarmTopAppBar
+import com.radiantmood.calarm.navigate
 import com.radiantmood.calarm.screen.calendars.CalendarRow
 
 val LocalSettingsScreenViewModel = compositionLocalOf<SettingsViewModel> { error("No SettingsViewModel") }
@@ -31,7 +32,7 @@ val LocalSettingsScreenViewModel = compositionLocalOf<SettingsViewModel> { error
 // TODO: @previews on each screen file
 
 @Composable
-fun SettingsActivityScreen() {
+fun SettingsScreenRoot() {
     val vm: SettingsViewModel = viewModel()
     vm.getData()
     CompositionLocalProvider(
@@ -64,7 +65,7 @@ fun SettingsScreen() {
             val label = if (hasSelectedCalendars) "View More Calendars" else "Select Calendars" // TODO: to vm
             item {
                 // TODO: make a settings row
-                Button(onClick = { navController.navigate("calendars") }) {
+                Button(onClick = { navController.navigate(CalendarSelectionScreen) }) {
                     Text(label, modifier = Modifier.padding(12.dp))
                 }
             }

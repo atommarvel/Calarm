@@ -20,6 +20,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@Composable
+fun PermissionsScreenRoot() {
+    PermissionScreen()
+}
 
 @Composable
 fun PermissionScreen() {

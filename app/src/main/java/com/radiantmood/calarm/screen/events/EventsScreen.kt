@@ -25,11 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.navigate
-import com.radiantmood.calarm.BuildConfig
-import com.radiantmood.calarm.LocalAppBarTitle
-import com.radiantmood.calarm.LocalNavController
-import com.radiantmood.calarm.LocalPermissionsUtil
+import com.radiantmood.calarm.*
 import com.radiantmood.calarm.compose.*
 import com.radiantmood.calarm.screen.LoadingState
 import com.radiantmood.calarm.util.getDebugEvent
@@ -38,7 +34,7 @@ import com.radiantmood.calarm.util.getFutureCalendar
 val LocalEventsViewModel = compositionLocalOf<EventsViewModel> { error("No EventsViewModel") }
 
 @Composable
-fun EventsActivityScreen() {
+fun EventsScreenRoot() {
     val navController = LocalNavController.current
     if (LocalPermissionsUtil.current.checkPermissions(navController)) return
     val vm: EventsViewModel = viewModel()
@@ -69,9 +65,8 @@ fun EventsScreen() {
                     vm.toggleDebug()
                 }
             }
-            // TODO: vectorResource method deprecated!
             AppBarAction(Icons.Default.Settings) {
-                navController.navigate("settings")
+                navController.navigate(SettingsScreen)
             }
         })
         if (screenModel.showDebugAlarmButton) DebugAlarmButton()
@@ -161,7 +156,7 @@ fun EventRow(event: EventModel) {
                 if (event.isAlarmSet) {
                     OffsetView(Modifier.weight(1f), event)
                 }
-                Switch(checked = event.isAlarmSet, onCheckedChange = { event.onToggleAlarm })
+                Switch(checked = event.isAlarmSet, onCheckedChange = { event.onToggleAlarm() })
             }
             event.debugData?.let {
                 Text(it)
