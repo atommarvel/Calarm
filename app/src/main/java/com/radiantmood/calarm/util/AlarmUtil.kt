@@ -29,9 +29,8 @@ class AlarmUtil {
     }
 
     private fun createPendingIntent(userAlarm: UserAlarm): PendingIntent {
-        // TODO: also clear backstack so that dismissing the alarm dismisses the app
         val intent = Intent(calarm, AlarmExperienceActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         AlarmIntentData.fromUserAlarm(userAlarm).putInIntent(intent)
         val pIntentFlags = Intent.FLAG_ACTIVITY_NEW_TASK or PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
