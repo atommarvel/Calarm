@@ -49,7 +49,6 @@ class EventRepository {
         val end = END via LONG
         val eventId = EVENT_ID via INT
         val color = CALENDAR_COLOR via INT
-        // TODO: add calendar color
 
         override val projections: List<Projection> = listOf(calId, title, begin, end, eventId, color)
 
@@ -77,7 +76,6 @@ class EventRepository {
             ContentUris.appendId(builder, startTime.timeInMillis)
             ContentUris.appendId(builder, endTime.timeInMillis)
             val contentResolver: ContentResolver = calarm.contentResolver
-            // TODO: sort order
             checkNotNull(contentResolver.query(builder.build(), keys, getSelection(), null, null)).also {
                 Log.i(TAG, "found ${it.count} events")
             }

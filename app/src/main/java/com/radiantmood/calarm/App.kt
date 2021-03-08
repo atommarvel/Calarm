@@ -15,6 +15,8 @@ val LocalAppBarTitle = compositionLocalOf<String> { error("No AppBarTitle") }
 
 /**
  * TODO: animate screen navigation
+ * TODO: accessibility
+ * TODO: onboarding screen
  */
 @Composable
 fun App(activity: ComponentActivity) {

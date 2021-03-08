@@ -67,6 +67,9 @@ class EventsViewModel : ViewModel() {
         }
     }
 
+    /**
+     * TODO: PTR
+     */
     fun getData() = viewModelScope.launch {
         val selectedIds = selectedCalendarsRepo.getAll().toMutableList()
         val events = eventRepo.queryEvents(selectedIds).toMutableList()

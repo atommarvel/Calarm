@@ -58,7 +58,6 @@ fun EventsScreen() {
         // TODO: Scaffold
         CalarmTopAppBar(actions = {
             // TODO: add a quick way to get to calendar app
-            // TODO: add a quick way to create an invisible event for 11:59 pm for testing
             if (BuildConfig.DEBUG) {
                 AppBarAction(imageVector = Icons.Default.BugReport) {
                     // TODO: toggling debug and then flinging the list results in a compose embedded crash. Why?

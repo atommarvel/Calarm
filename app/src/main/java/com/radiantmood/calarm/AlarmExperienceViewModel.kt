@@ -12,6 +12,7 @@ import com.radiantmood.calarm.repo.AlarmRepository
 import com.radiantmood.calarm.util.AlarmUtil.AlarmIntentData
 import kotlinx.coroutines.launch
 
+// TODO: try/catch everything this does
 class AlarmExperienceViewModel : ViewModel() {
 
     private val _title = MutableLiveData<String>()
@@ -38,6 +39,10 @@ class AlarmExperienceViewModel : ViewModel() {
     }
 
     private fun deleteAlarm(alarmIntentData: AlarmIntentData?) = viewModelScope.launch {
-        alarmIntentData?.eventId?.let { alarmRepo.remove(it) }
+        try {
+            alarmIntentData?.eventId?.let { alarmRepo.remove(it) }
+        } catch (e: Exception) {
+            // Do nothing. We will reconcile it later if needed.
+        }
     }
 }
