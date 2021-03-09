@@ -2,6 +2,7 @@ package com.radiantmood.calarm.compose
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -17,6 +18,7 @@ import com.radiantmood.calarm.screen.LoadingModelContainer
 import com.radiantmood.calarm.screen.ModelContainer
 import com.radiantmood.calarm.ui.theme.CalarmTheme
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 
 @Composable
 fun Fullscreen(content: @Composable ColumnScope.() -> Unit) {
@@ -37,18 +39,22 @@ fun <T : ModelContainer<T>> ModelContainerContent(
     modelContainer: ModelContainer<T>,
     finishedContent: @Composable (T) -> Unit
 ) {
-    when (modelContainer) {
-        // TODO: animated transition to finished content
-        // TODO: prevent flashing of loading screen
-        is LoadingModelContainer<*> -> LoadingScreen()
-        is ErrorModelContainer<*> -> ErrorScreen(modelContainer)
-        is FinishedModelContainer<T> -> finishedContent(modelContainer as T)
+    Crossfade(targetState = modelContainer.key, modifier = Modifier.fillMaxSize()) {
+        when (val rememberedModelContainer = remember(it) { modelContainer }) {
+            is LoadingModelContainer<*> -> LoadingScreen()
+            is ErrorModelContainer<*> -> ErrorScreen(rememberedModelContainer)
+            is FinishedModelContainer<T> -> finishedContent(rememberedModelContainer as T)
+        }
     }
 }
 
 @Composable
 fun LoadingScreen() = Fullscreen {
-    CircularProgressIndicator()
+    // Delay showing spinner by 300 ms. We only show spinner when things are taking a while.
+    val showSpinner = composableFetch { delay(300); true } ?: false
+    if (showSpinner) {
+        CircularProgressIndicator()
+    }
 }
 
 @Composable
