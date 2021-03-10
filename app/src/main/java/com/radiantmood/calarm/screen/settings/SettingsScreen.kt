@@ -1,5 +1,7 @@
 package com.radiantmood.calarm.screen.settings
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,6 +13,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -18,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -68,6 +72,21 @@ fun SettingsList(screenModel: SettingsScreenModel) {
             SelectedCalendarsHeader(screenModel.selectedCalendars.isNotEmpty(), expanded, setExpanded)
         }
         SelectedCalendars(expanded, screenModel.selectedCalendars)
+        item {
+            GitHubRow()
+            Divider()
+        }
+    }
+}
+
+@Composable
+fun GitHubRow() {
+    val context = LocalContext.current
+    SettingsRow(icon = Icons.Default.Code, text = "Open-sourced on GitHub!") {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("https://github.com/atommarvel/Calarm")
+        }
+        context.startActivity(intent)
     }
 }
 
