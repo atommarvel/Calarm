@@ -39,11 +39,16 @@ fun <T : ModelContainer<T>> ModelContainerContent(
     modelContainer: ModelContainer<T>,
     finishedContent: @Composable (T) -> Unit
 ) {
+
     Crossfade(targetState = modelContainer.key, modifier = Modifier.fillMaxSize()) {
-        when (val rememberedModelContainer = remember(it) { modelContainer }) {
+        val rememberedModelContainer = remember(it) { modelContainer }
+        // rememberedModelContainer doesn't know the difference between two finished models. Always update to use the newer finished model, but don't crossfade between finished models.
+        val model =
+            if (rememberedModelContainer is FinishedModelContainer && modelContainer is FinishedModelContainer) modelContainer else rememberedModelContainer
+        when (model) {
             is LoadingModelContainer<*> -> LoadingScreen()
-            is ErrorModelContainer<*> -> ErrorScreen(rememberedModelContainer)
-            is FinishedModelContainer<T> -> finishedContent(rememberedModelContainer as T)
+            is ErrorModelContainer<*> -> ErrorScreen(model)
+            is FinishedModelContainer<T> -> finishedContent(model as T)
         }
     }
 }

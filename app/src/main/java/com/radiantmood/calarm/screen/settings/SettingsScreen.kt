@@ -34,8 +34,6 @@ import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
 
 val LocalSettingsScreenViewModel = compositionLocalOf<SettingsViewModel> { error("No SettingsViewModel") }
 
-// TODO: @previews on each screen file... or a single preview file?
-
 @Composable
 fun SettingsScreenRoot() {
     val vm: SettingsViewModel = viewModel()
@@ -78,7 +76,7 @@ fun SelectedCalendarsHeader(shouldShow: Boolean, expanded: Boolean, setExpanded:
     if (shouldShow) {
         val expandIconRotation = animateFloatAsState(targetValue = if (expanded) 0f else 180f)
         SettingsRow(icon = Icons.Default.ExpandLess, iconRotation = expandIconRotation.value, text = "Currently selected calendars:") {
-            setExpanded(expanded)
+            setExpanded(!expanded)
         }
         Divider()
     }
