@@ -1,23 +1,43 @@
 package com.radiantmood.calarm.compose
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.radiantmood.calarm.LocalAppBarTitle
 import com.radiantmood.calarm.LocalNavController
 
 @Composable
 fun CalarmTopAppBar(actions: @Composable () -> Unit = {}) {
     val title = LocalAppBarTitle.current
-    TopAppBar(
-        title = { Text(title) },
-        navigationIcon = { NavBack() },
-        actions = { actions() })
+    Row(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        NavBack()
+        Text(
+            text = title,
+            style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
+            modifier = Modifier.weight(1f)
+        )
+        actions()
+    }
+
+//    TopAppBar(
+//        title = { Text(title) },
+//        navigationIcon = { NavBack() },
+//        actions = { actions() })
 }
 
 @Composable

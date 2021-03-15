@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.radiantmood.calarm.*
 import com.radiantmood.calarm.compose.*
 import com.radiantmood.calarm.screen.LoadingModelContainer
@@ -32,17 +33,20 @@ import com.radiantmood.calarm.screen.ModelContainer
 import com.radiantmood.calarm.util.getDebugEvent
 import com.radiantmood.calarm.util.getFutureCalendar
 
-val LocalEventsViewModel = compositionLocalOf<EventsViewModel> { error("No EventsViewModel") }
+private val LocalEventsViewModel = compositionLocalOf<EventsViewModel> { error("No EventsViewModel") }
+private val vm: EventsViewModel
+    @Composable get() = LocalEventsViewModel.current
+private val navController: NavHostController
+    @Composable get() = LocalNavController.current
 
 @Composable
 fun EventsScreenRoot() {
-    val navController = LocalNavController.current
     if (LocalPermissionsUtil.current.checkPermissions(navController)) return
-    val vm: EventsViewModel = viewModel()
-    vm.getData()
+    val eventsViewModel: EventsViewModel = viewModel()
+    eventsViewModel.getData()
     CompositionLocalProvider(
-        LocalAppBarTitle provides "Events", // TODO: Strings -> resource ids
-        LocalEventsViewModel provides vm
+        LocalAppBarTitle provides "Calarms", // TODO: Strings -> resource ids
+        LocalEventsViewModel provides eventsViewModel
     ) {
         EventsScreen()
     }
@@ -50,32 +54,39 @@ fun EventsScreenRoot() {
 
 @Composable
 fun EventsScreen() {
-    val navController = LocalNavController.current
-    val vm = LocalEventsViewModel.current
     val modelContainer: ModelContainer<EventsScreenModel> by vm.eventsScreen.observeAsState(LoadingModelContainer())
-
-    Column {
-        // TODO: Scaffold
-        CalarmTopAppBar(actions = {
-            // TODO: add a quick way to get to calendar app
-            if (BuildConfig.DEBUG) {
-                AppBarAction(imageVector = Icons.Default.BugReport) {
-                    // TODO: toggling debug and then flinging the list results in a compose embedded crash. Why?
-                    vm.toggleDebug()
-                }
-            }
-            AppBarAction(Icons.Default.Settings) {
-                navController.navigate(SettingsScreen)
-            }
-        })
-
-        ModelContainerContent(modelContainer) { screenModel ->
-            when (screenModel) {
-                is EventsScreenModel.Eventful -> EventfulEventsScreen(screenModel)
-                is EventsScreenModel.FullscreenMessage -> Fullscreen { Text(screenModel.message) }
-            }
+    ModelContainerContent(modelContainer) { screenModel ->
+        when (screenModel) {
+            is EventsScreenModel.Eventful -> EventfulEventsScreen(screenModel)
+            is EventsScreenModel.FullscreenMessage -> FullscreenMessageEventsScreen(screenModel.message)
         }
     }
+}
+
+@Composable
+fun FullscreenMessageEventsScreen(message: String) {
+    Column {
+        TopBar()
+        Fullscreen { Text(message) }
+    }
+}
+
+@Composable
+fun TopBar() {
+    val vm = vm
+    val navController = navController
+    CalarmTopAppBar(actions = {
+        // TODO: add a quick way to get to calendar app
+        if (BuildConfig.DEBUG) {
+            AppBarAction(imageVector = Icons.Default.BugReport) {
+                // TODO: toggling debug and then flinging the list results in a compose embedded crash. Why?
+                vm.toggleDebug()
+            }
+        }
+        AppBarAction(Icons.Default.Settings) {
+            navController.navigate(SettingsScreen)
+        }
+    })
 }
 
 @Composable
@@ -87,7 +98,7 @@ fun EventfulEventsScreen(screenModel: EventsScreenModel.Eventful) {
 // TODO: move to settings screen
 @Composable
 fun DebugAlarmButton() {
-    val vm = LocalEventsViewModel.current
+    val vm = vm
     Button({
         val event = getDebugEvent(getFutureCalendar(secondsInFuture = 10))
         vm.scheduleAlarm(event.eventId, event.start, event.title)
@@ -99,6 +110,7 @@ fun DebugAlarmButton() {
 @Composable
 fun EventsList(eventList: List<EventModel>, tmoEventList: List<EventModel>, alarmList: List<UnmappedAlarmModel>) {
     LazyColumn {
+        item { TopBar() }
         SectionTitle(eventList.isNotEmpty(), "Today's Events")
         items(eventList) { event ->
             EventRow(event)
