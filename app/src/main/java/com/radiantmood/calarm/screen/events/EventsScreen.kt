@@ -234,7 +234,6 @@ fun EventLabel(label: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun EventRow(model: CalarmModel) {
-    val isAlarmSet = model.alarm != null
     val rowModifier = Modifier.padding(horizontal = 16.dp)
     Card(
         elevation = 4.dp,
