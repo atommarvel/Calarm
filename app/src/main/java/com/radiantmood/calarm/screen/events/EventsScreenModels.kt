@@ -8,27 +8,36 @@ import java.util.*
 
 data class EventDisplay(val calEvent: EventRepository.CalEvent, val userAlarm: UserAlarm?)
 
+data class CalarmModel(
+    val event: EventModel,
+    val calendar: CalendarModel,
+    val alarm: AlarmModel?,
+)
+
 data class EventModel(
-    val eventName: String,
+    val name: String,
     val timeRange: String,
-    val isAlarmSet: Boolean,
-    val alarmOffset: Int,
-    val calColor: Color,
-    val calName: String,
     val doesNextEventOverlap: Boolean,
     val debugData: String? = null,
     val onToggleAlarm: () -> Unit,
+)
+
+data class AlarmModel(
+    val cal: Calendar,
+    val offset: Long,
     val onIncreaseOffset: () -> Unit,
     val onDecreaseOffset: () -> Unit
 )
+
+data class CalendarModel(val name: String, val color: Color)
 
 data class UnmappedAlarmModel(val label: String, val onRemoveAlarm: () -> Unit)
 
 sealed class EventsScreenModel : FinishedModelContainer<EventsScreenModel>() {
     data class Eventful(
         val header: EventfulHeader,
-        val eventModels: List<EventModel>,
-        val tmoEventModels: List<EventModel>,
+        val eventModels: List<CalarmModel>,
+        val tmoEventModels: List<CalarmModel>,
         val unmappedAlarms: List<UnmappedAlarmModel>,
         val showDebugAlarmButton: Boolean
     ) : EventsScreenModel()

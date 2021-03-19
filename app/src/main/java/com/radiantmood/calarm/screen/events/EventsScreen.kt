@@ -2,6 +2,7 @@ package com.radiantmood.calarm.screen.events
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -9,8 +10,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
@@ -18,8 +17,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstrainScope
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.radiantmood.calarm.*
@@ -34,6 +39,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 private val LocalEventsViewModel = compositionLocalOf<EventsViewModel> { error("No EventsViewModel") }
 private val vm: EventsViewModel
@@ -103,16 +109,17 @@ fun EventfulEventsScreen(screenModel: EventsScreenModel.Eventful) {
 
 @Composable
 fun countDownProducer(cal: Calendar?): State<String> {
-    val currentCal by rememberUpdatedState(cal)
-    return produceState(initialValue = "") {
+    return produceState(initialValue = "", key1 = cal) {
         launch {
             while (isActive) {
-                currentCal?.let {
+                cal?.let {
                     val diffMillis = it.timeInMillis - System.currentTimeMillis()
                     val hour = TimeUnit.MILLISECONDS.toHours(diffMillis)
                     val minute = TimeUnit.MILLISECONDS.toMinutes(diffMillis - TimeUnit.HOURS.toMillis(hour))
                     val second = TimeUnit.MILLISECONDS.toSeconds(diffMillis - TimeUnit.HOURS.toMillis(hour) - TimeUnit.MINUTES.toMillis(minute))
                     value = "$hour hours, $minute minutes, $second seconds"
+                } ?: run {
+                    value = ""
                 }
                 delay(1000)
             }
@@ -120,6 +127,7 @@ fun countDownProducer(cal: Calendar?): State<String> {
     }
 }
 
+// TODO: no alarm set
 @Composable
 fun EventfulHeader(screenModel: EventsScreenModel.Eventful) {
     val label = countDownProducer(screenModel.header.nextAlarmStart)
@@ -146,37 +154,34 @@ fun DebugAlarmButton() {
     }
 }
 
-fun LazyListScope.EventsList(eventList: List<EventModel>, tmoEventList: List<EventModel>, alarmList: List<UnmappedAlarmModel>) {
+fun LazyListScope.EventsList(eventList: List<CalarmModel>, tmoEventList: List<CalarmModel>, alarmList: List<UnmappedAlarmModel>) {
     SectionTitle(eventList.isNotEmpty(), "Today", Modifier.padding(16.dp))
-    items(eventList) { event ->
-        EventRow(event)
-        if (event.doesNextEventOverlap) {
-            Box(
-                modifier = Modifier
-                    .height(18.dp)
-                    .width(1.dp)
-                    .background(color = Color.Black.copy(alpha = 0.38f))
-            )
-        } else {
-            Spacer(modifier = Modifier.height(18.dp))
-        }
-        // TODO
-//        if (!event.doesNextEventOverlap) {
-//            Divider()
-//        }
+    items(eventList) { model ->
+        EventRow(model)
+        EventBottomSpacer(model.event.doesNextEventOverlap)
     }
     SectionTitle(tmoEventList.isNotEmpty(), "Tomorrow", Modifier.padding(16.dp))
-    items(tmoEventList) { event ->
-        EventRow(event)
-        Spacer(modifier = Modifier.height(18.dp))
-        // TODO
-//        if (!event.doesNextEventOverlap) {
-//            Divider()
-//        }
+    items(tmoEventList) { model ->
+        EventRow(model)
+        EventBottomSpacer(model.event.doesNextEventOverlap)
     }
     SectionTitle(alarmList.isNotEmpty(), "Unmapped Alarms", Modifier.padding(16.dp))
     items(alarmList) { unmappedAlarm ->
         UnmappedAlarmRow(unmappedAlarm)
+    }
+}
+
+@Composable
+fun EventBottomSpacer(doesNextEventOverlap: Boolean) {
+    if (doesNextEventOverlap) {
+        Box(
+            modifier = Modifier
+                .height(18.dp)
+                .width(1.dp)
+                .background(color = Color.Black.copy(alpha = 0.38f))
+        )
+    } else {
+        Spacer(modifier = Modifier.height(18.dp))
     }
 }
 
@@ -228,34 +233,141 @@ fun EventLabel(label: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun EventRow(event: EventModel) {
+fun EventRow(model: CalarmModel) {
+    val isAlarmSet = model.alarm != null
+    val rowModifier = Modifier.padding(horizontal = 16.dp)
     Card(
         elevation = 4.dp,
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            modifier = Modifier//.padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
+            model.alarm?.let {
+                EventRowHeader(model.alarm)
+            }
+            Spacer(Modifier.height(12.dp))
             Row(
+                modifier = rowModifier,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TimeRangeLabel(event.timeRange, Modifier.weight(1f))
-                CalendarDot(event.calColor)
+                TimeRangeLabel(model.event.timeRange, Modifier.weight(1f))
+                CalendarDot(model.calendar.color)
                 Spacer(Modifier.width(4.dp))
-                CalendarLabel(event.calName)
+                CalendarLabel(model.calendar.name)
             }
             Spacer(Modifier.height(8.dp))
             Row(
+                modifier = rowModifier,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                EventLabel(label = event.eventName, modifier = Modifier.weight(1f))
-                Switch(checked = event.isAlarmSet, onCheckedChange = { event.onToggleAlarm() })
+                EventLabel(label = model.event.name, modifier = Modifier.weight(1f))
+                Switch(checked = model.alarm != null, onCheckedChange = { model.event.onToggleAlarm() })
             }
-            event.debugData?.let { Row { Text(it) } }
+            model.event.debugData?.let { Row { Text(it) } }
+            Spacer(Modifier.height(12.dp))
         }
 //                    if (event.isAlarmSet) {
 //                        OffsetView(Modifier.weight(1f), event)
 //                    }
+    }
+}
+
+@Composable
+fun EventRowHeader(alarm: AlarmModel) {
+    Surface(color = MaterialTheme.colors.secondary) {
+        val constraintSet = ConstraintSet {
+            val alarmTime = createRefFor("alarmTime")
+            val minus = createRefFor("minus")
+            val minusTarget = createRefFor("minusTarget")
+            val offsetDescription = createRefFor("offsetDescription")
+            val plus = createRefFor("plus")
+            val plusTarget = createRefFor("plusTarget")
+            val midDescription = createRefFor("midDescription")
+
+            fun ConstrainScope.topBotLinkToParent(topMargin: Dp = 12.dp, bottomMargin: Dp = 8.dp) {
+                top.linkTo(parent.top, topMargin)
+                bottom.linkTo(parent.bottom, bottomMargin)
+            }
+
+            constrain(alarmTime) {
+                topBotLinkToParent()
+                start.linkTo(parent.start)
+            }
+
+            constrain(plus) {
+                topBotLinkToParent()
+                end.linkTo(parent.end)
+            }
+
+            constrain(offsetDescription) {
+                topBotLinkToParent()
+                end.linkTo(plus.start, 4.dp)
+            }
+
+            constrain(midDescription) {
+                topBotLinkToParent()
+                start.linkTo(offsetDescription.start)
+                end.linkTo(offsetDescription.end)
+            }
+
+            constrain(minus) {
+                topBotLinkToParent()
+                end.linkTo(offsetDescription.start, 4.dp)
+            }
+
+            constrain(plusTarget) {
+                topBotLinkToParent(0.dp, 0.dp)
+                end.linkTo(parent.end)
+                start.linkTo(midDescription.end)
+                width = Dimension.fillToConstraints
+                height = Dimension.fillToConstraints
+            }
+
+            constrain(minusTarget) {
+                topBotLinkToParent(0.dp, 0.dp)
+                start.linkTo(minus.start)
+                end.linkTo(midDescription.start)
+                width = Dimension.fillToConstraints
+                height = Dimension.fillToConstraints
+            }
+        }
+
+        ConstraintLayout(
+            constraintSet,
+            modifier = Modifier
+                .background(color = Color.Transparent, MaterialTheme.shapes.small)
+                .padding(start = 16.dp)
+                .fillMaxWidth(),
+        ) {
+            Text(alarm.cal.formatTime(), modifier = Modifier.layoutId("alarmTime"), style = MaterialTheme.typography.subtitle2)
+            Text(" - ", style = MaterialTheme.typography.subtitle2, modifier = Modifier
+                .layoutId("minus")
+                .padding(start = 32.dp))
+            val beforeAfter = if (alarm.offset > 0) "after" else "before"
+            Text(
+                "Ring ${abs(alarm.offset)} minutes $beforeAfter",
+                style = MaterialTheme.typography.subtitle2,
+                modifier = Modifier.layoutId("offsetDescription")
+            )
+            Box(
+                Modifier
+                    .width(1.dp)
+                    .fillMaxHeight()
+                    .layoutId("midDescription"))
+            Text(" + ", style = MaterialTheme.typography.subtitle2, modifier = Modifier
+                .layoutId("plus")
+                .padding(end = 16.dp))
+
+            Box(
+                Modifier
+                    .layoutId("minusTarget")
+                    .clickable { alarm.onDecreaseOffset() })
+            Box(
+                Modifier
+                    .layoutId("plusTarget")
+                    .clickable { alarm.onIncreaseOffset() })
+        }
     }
 }
 
@@ -266,15 +378,4 @@ fun CalendarDot(color: Color) {
             .background(color, CircleShape)
             .size(12.dp)
     )
-}
-
-@Composable
-fun OffsetView(modifier: Modifier = Modifier, event: EventModel) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Offset: ${event.alarmOffset}")
-        Row {
-            AppBarAction(Icons.Default.ArrowDownward, event.onDecreaseOffset)
-            AppBarAction(Icons.Default.ArrowUpward, event.onIncreaseOffset)
-        }
-    }
 }
