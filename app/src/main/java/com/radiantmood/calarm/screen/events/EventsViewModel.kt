@@ -67,10 +67,27 @@ class EventsViewModel : ViewModel() {
         }
     }
 
+    private class HeaderBuilder(var firstAlarm: Calendar? = null, var alarmCount: Int = 0) {
+        /**
+         * Consumption assumes that the event models are given by order of start time!
+         */
+        fun consumeAlarm(alarm: UserAlarm?) {
+            alarm?.let {
+                alarmCount++
+                if (firstAlarm == null) {
+                    firstAlarm = alarm.calendar
+                }
+            }
+        }
+
+        fun produceHeader() = EventfulHeader(firstAlarm, "$alarmCount Calarms left today")
+    }
+
     /**
      * TODO: PTR
      */
     fun getData() = viewModelScope.launch {
+        val headerBuilder = HeaderBuilder()
         val selectedIds = selectedCalendarsRepo.getAll().toMutableList()
         val events = eventRepo.queryEvents(selectedIds).toMutableList()
         val tmoEvents = eventRepo.queryTomorrowsEvents(selectedIds)
@@ -83,12 +100,12 @@ class EventsViewModel : ViewModel() {
         val eventModels = events.mapIndexed { index, event ->
             val previouslyProcessed = processedEventIds.contains(event.eventId)
             processedEventIds.add(event.eventId)
-            createEventModel(event, events.getOrNull(index + 1), previouslyProcessed)
+            createEventModel(event, events.getOrNull(index + 1), previouslyProcessed, headerBuilder)
         }
         val tmoEventModels = tmoEvents.mapIndexed { index, event ->
             val previouslyProcessed = processedEventIds.contains(event.eventId)
             processedEventIds.add(event.eventId)
-            createEventModel(event, tmoEvents.getOrNull(index + 1), previouslyProcessed)
+            createEventModel(event, tmoEvents.getOrNull(index + 1), previouslyProcessed, headerBuilder)
         }
         val unmappedAlarmModels = alarmRepo.queryAlarms()
             .filter { !eventIds.contains(it.eventId) }
@@ -99,6 +116,7 @@ class EventsViewModel : ViewModel() {
             else -> null
         }
         val model = fullScreenMessage?.let { EventsScreenModel.FullscreenMessage(it) } ?: EventsScreenModel.Eventful(
+            headerBuilder.produceHeader(),
             eventModels,
             tmoEventModels,
             unmappedAlarmModels,
@@ -113,9 +131,15 @@ class EventsViewModel : ViewModel() {
             onRemoveAlarm = ::cancelAlarm.bind(it)
         )
 
-    private suspend fun createEventModel(event: CalEvent, nextEvent: CalEvent? = null, previouslyProcessed: Boolean = false): EventModel {
+    private suspend fun createEventModel(
+        event: CalEvent,
+        nextEvent: CalEvent? = null,
+        previouslyProcessed: Boolean = false,
+        headerBuilder: HeaderBuilder? = null
+    ): EventModel {
         val alarm =
             if (!previouslyProcessed) alarmRepo.getForEvent(event.eventId) else null // TODO: reject alarm if it is 24 hr off (aka it's a daily recurring event)
+        headerBuilder?.consumeAlarm(alarm)
         EventDisplay(event, alarm)
         val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
         val isAlarmSet = alarm != null
@@ -131,6 +155,7 @@ class EventsViewModel : ViewModel() {
             isAlarmSet = isAlarmSet,
             alarmOffset = offsetMinutes.toInt(),
             calColor = Color(event.calColorInt),
+            calName = "Schedule", // TODO: get actual name
             doesNextEventOverlap = doesNextEventOverlap,
             debugData = debugData,
             onToggleAlarm = ::toggleAlarm.bind(event),

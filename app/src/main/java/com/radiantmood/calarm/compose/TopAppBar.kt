@@ -22,14 +22,16 @@ import com.radiantmood.calarm.LocalNavController
 fun CalarmTopAppBar(actions: @Composable () -> Unit = {}) {
     val title = LocalAppBarTitle.current
     Row(
-        modifier = Modifier.padding(horizontal = 16.dp),
+        modifier = Modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         NavBack()
         Text(
             text = title,
             style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 16.dp)
         )
         actions()
     }
