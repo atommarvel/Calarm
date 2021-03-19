@@ -267,9 +267,6 @@ fun EventRow(model: CalarmModel) {
             model.event.debugData?.let { Row { Text(it) } }
             Spacer(Modifier.height(12.dp))
         }
-//                    if (event.isAlarmSet) {
-//                        OffsetView(Modifier.weight(1f), event)
-//                    }
     }
 }
 
