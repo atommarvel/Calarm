@@ -12,13 +12,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstrainScope
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
+import com.radiantmood.calarm.ui.theme.CalarmTheme
+import com.radiantmood.calarm.util.LoremIpsum
 import com.radiantmood.calarm.util.formatTime
+import java.util.*
 import kotlin.math.abs
 
 @Composable
@@ -163,6 +167,7 @@ fun EventRowHeader(alarm: AlarmModel) {
             constraintSet,
             modifier = Modifier
                 .background(color = Color.Transparent, MaterialTheme.shapes.small)
+                .heightIn(max = 32.dp) // This height is here because @Preview has a bug with fillToConstraints.
                 .padding(start = 16.dp)
                 .fillMaxWidth(),
         ) {
@@ -199,5 +204,41 @@ fun EventRowHeader(alarm: AlarmModel) {
                     .layoutId("plusTarget")
                     .clickable { alarm.onIncreaseOffset() })
         }
+    }
+}
+
+private fun getPreviewCalarmModel(hasAlarm: Boolean = true): CalarmModel =
+    CalarmModel(
+        event = EventModel(
+            name = LoremIpsum.Short,
+            timeRange = "11:35am - 12:00pm",
+            doesNextEventOverlap = false,
+            onToggleAlarm = { }
+        ),
+        calendar = CalendarModel(
+            name = "Schedule",
+            color = Color.Red
+        ),
+        alarm = if (hasAlarm) AlarmModel(
+            cal = Calendar.getInstance(),
+            offset = -1L,
+            onIncreaseOffset = {},
+            onDecreaseOffset = {}
+        ) else null
+    )
+
+@Preview
+@Composable
+fun PreviewEventRowUnselected() {
+    CalarmTheme {
+        EventRow(getPreviewCalarmModel(false))
+    }
+}
+
+@Preview
+@Composable
+fun PreviewEventRowSelected() {
+    CalarmTheme {
+        EventRow(getPreviewCalarmModel())
     }
 }
