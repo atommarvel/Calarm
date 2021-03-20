@@ -73,13 +73,13 @@ fun EventCardHeader(alarm: AlarmModel) {
 
 private val ref by lazy {
     object {
-        val alarmTime by lazy { ConstrainedLayoutReference("alarmTime") }
-        val minus by lazy { ConstrainedLayoutReference("minus") }
-        val minusTarget by lazy { ConstrainedLayoutReference("minusTarget") }
-        val offsetDescription by lazy { ConstrainedLayoutReference("offsetDescription") }
-        val plus by lazy { ConstrainedLayoutReference("plus") }
-        val plusTarget by lazy { ConstrainedLayoutReference("plusTarget") }
-        val midDescription by lazy { ConstrainedLayoutReference("midDescription") }
+        val alarmTime = ConstrainedLayoutReference("alarmTime")
+        val minus = ConstrainedLayoutReference("minus")
+        val minusTarget = ConstrainedLayoutReference("minusTarget")
+        val offsetDescription = ConstrainedLayoutReference("offsetDescription")
+        val plus = ConstrainedLayoutReference("plus")
+        val plusTarget = ConstrainedLayoutReference("plusTarget")
+        val midDescription = ConstrainedLayoutReference("midDescription")
     }
 }
 
