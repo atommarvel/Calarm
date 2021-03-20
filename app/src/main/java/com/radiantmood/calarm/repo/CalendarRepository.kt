@@ -18,7 +18,10 @@ class CalendarRepository {
     @WorkerThread
     suspend fun queryCalendars(): List<UserCal> = NewCalendarCursor().map { it }
 
-    class NewCalendarCursor : CursorHelper<UserCal>() {
+    @WorkerThread
+    suspend fun getCalendar(targetId: Int): UserCal? = NewCalendarCursor(targetId).firstOrNull()
+
+    class NewCalendarCursor(private val targetId: Int? = null) : CursorHelper<UserCal>() {
         val id = _ID via INT
         val name = CALENDAR_DISPLAY_NAME via STRING
         val color = CALENDAR_COLOR via INT
@@ -34,6 +37,7 @@ class CalendarRepository {
 
         override val cursor: Cursor by lazy {
             val builder: Uri.Builder = Calendars.CONTENT_URI.buildUpon()
+            targetId?.let { builder.appendPath(it.toString()) }
             val contentResolver: ContentResolver = calarm.contentResolver
             checkNotNull(contentResolver.query(builder.build(), keys, null, null, null))
         }

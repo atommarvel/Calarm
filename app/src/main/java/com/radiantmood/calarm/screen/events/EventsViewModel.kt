@@ -5,11 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.radiantmood.calarm.repo.AlarmRepository
-import com.radiantmood.calarm.repo.EventRepository
+import com.radiantmood.calarm.repo.*
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
-import com.radiantmood.calarm.repo.SelectedCalendarsRepository
-import com.radiantmood.calarm.repo.UserAlarm
 import com.radiantmood.calarm.screen.LoadingModelContainer
 import com.radiantmood.calarm.screen.ModelContainer
 import com.radiantmood.calarm.util.*
@@ -25,6 +22,7 @@ class EventsViewModel : ViewModel() {
 
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
     private val eventRepo = EventRepository()
+    private val calendarRepo = CalendarRepository()
 
     // TODO: group alarm classes into a manager?
     private val alarmRepo = AlarmRepository()
@@ -165,7 +163,7 @@ class EventsViewModel : ViewModel() {
                 onToggleAlarm = ::toggleAlarm.bind(event)
             ),
             calendar = CalendarModel(
-                name = event.calId.toString(), // TODO: get actual name
+                name = event.calName,
                 color = Color(event.calColorInt)
             ),
             alarm = alarmModel
