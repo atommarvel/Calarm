@@ -1,7 +1,6 @@
 package com.radiantmood.calarm.screen.events
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -40,16 +39,6 @@ fun EventsScreen() {
             is EventsScreenModel.Eventful -> EventfulEventsScreen(screenModel)
             is EventsScreenModel.FullscreenMessage -> FullscreenMessageEventsScreen(screenModel.message)
         }
-    }
-}
-
-@Composable
-fun EventfulEventsScreen(screenModel: EventsScreenModel.Eventful) {
-    if (screenModel.showDebugAlarmButton) DebugAlarmButton()
-    LazyColumn {
-        item { EventScreenTopBar() }
-        item { EventfulHeader(screenModel) }
-        EventsList(screenModel.eventModels, screenModel.tmoEventModels, screenModel.unmappedAlarms)
     }
 }
 

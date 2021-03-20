@@ -26,15 +26,13 @@ import java.util.*
 import kotlin.math.abs
 
 @Composable
-fun EventRow(model: CalarmModel) {
+fun EventCard(model: CalarmModel) {
     val rowModifier = Modifier.padding(horizontal = 16.dp)
     Card(
         elevation = 4.dp,
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Column(
-            modifier = Modifier//.padding(horizontal = 16.dp, vertical = 12.dp)
-        ) {
+        Column {
             model.alarm?.let {
                 EventRowHeader(model.alarm)
             }
@@ -106,91 +104,39 @@ fun CalendarDot(color: Color) {
 @Composable
 fun EventRowHeader(alarm: AlarmModel) {
     Surface(color = MaterialTheme.colors.secondary) {
-        val constraintSet = ConstraintSet {
-            val alarmTime = createRefFor("alarmTime")
-            val minus = createRefFor("minus")
-            val minusTarget = createRefFor("minusTarget")
-            val offsetDescription = createRefFor("offsetDescription")
-            val plus = createRefFor("plus")
-            val plusTarget = createRefFor("plusTarget")
-            val midDescription = createRefFor("midDescription")
-
-            fun ConstrainScope.topBotLinkToParent(topMargin: Dp = 12.dp, bottomMargin: Dp = 8.dp) {
-                top.linkTo(parent.top, topMargin)
-                bottom.linkTo(parent.bottom, bottomMargin)
-            }
-
-            constrain(alarmTime) {
-                topBotLinkToParent()
-                start.linkTo(parent.start)
-            }
-
-            constrain(plus) {
-                topBotLinkToParent()
-                end.linkTo(parent.end)
-            }
-
-            constrain(offsetDescription) {
-                topBotLinkToParent()
-                end.linkTo(plus.start, 4.dp)
-            }
-
-            constrain(midDescription) {
-                topBotLinkToParent()
-                start.linkTo(offsetDescription.start)
-                end.linkTo(offsetDescription.end)
-            }
-
-            constrain(minus) {
-                topBotLinkToParent()
-                end.linkTo(offsetDescription.start, 4.dp)
-            }
-
-            constrain(plusTarget) {
-                topBotLinkToParent(0.dp, 0.dp)
-                end.linkTo(parent.end)
-                start.linkTo(midDescription.end)
-                width = Dimension.fillToConstraints
-                height = Dimension.fillToConstraints
-            }
-
-            constrain(minusTarget) {
-                topBotLinkToParent(0.dp, 0.dp)
-                start.linkTo(minus.start)
-                end.linkTo(midDescription.start)
-                width = Dimension.fillToConstraints
-                height = Dimension.fillToConstraints
-            }
-        }
-
         ConstraintLayout(
-            constraintSet,
+            eventRowHeaderConstraints,
             modifier = Modifier
-                .background(color = Color.Transparent, MaterialTheme.shapes.small)
-                .heightIn(max = 32.dp) // This height is here because @Preview has a bug with fillToConstraints.
                 .padding(start = 16.dp)
                 .fillMaxWidth(),
         ) {
-            Text(alarm.cal.formatTime(), modifier = Modifier.layoutId("alarmTime"), style = MaterialTheme.typography.subtitle2)
             Text(
-                " - ", style = MaterialTheme.typography.subtitle2, modifier = Modifier
+                text = alarm.cal.formatTime(),
+                modifier = Modifier.layoutId("alarmTime"),
+                style = MaterialTheme.typography.subtitle2
+            )
+            Text(
+                text = " - ",
+                style = MaterialTheme.typography.subtitle2,
+                modifier = Modifier
                     .layoutId("minus")
                     .padding(start = 32.dp)
             )
             val beforeAfter = if (alarm.offset > 0) "after" else "before"
             Text(
-                "Ring ${abs(alarm.offset)} minutes $beforeAfter", // TODO: right on time
+                text = "Ring ${abs(alarm.offset)} minutes $beforeAfter", // TODO: right on time
                 style = MaterialTheme.typography.subtitle2,
                 modifier = Modifier.layoutId("offsetDescription")
             )
             Box(
                 Modifier
                     .width(1.dp)
-                    .fillMaxHeight()
                     .layoutId("midDescription")
             )
             Text(
-                " + ", style = MaterialTheme.typography.subtitle2, modifier = Modifier
+                text = " + ",
+                style = MaterialTheme.typography.subtitle2,
+                modifier = Modifier
                     .layoutId("plus")
                     .padding(end = 16.dp)
             )
@@ -198,11 +144,72 @@ fun EventRowHeader(alarm: AlarmModel) {
             Box(
                 Modifier
                     .layoutId("minusTarget")
-                    .clickable { alarm.onDecreaseOffset() })
+                    .clickable { alarm.onDecreaseOffset() }
+            )
             Box(
                 Modifier
                     .layoutId("plusTarget")
-                    .clickable { alarm.onIncreaseOffset() })
+                    .clickable { alarm.onIncreaseOffset() }
+            )
+        }
+    }
+}
+
+val eventRowHeaderConstraints: ConstraintSet by lazy {
+    ConstraintSet {
+        val alarmTime = createRefFor("alarmTime")
+        val minus = createRefFor("minus")
+        val minusTarget = createRefFor("minusTarget")
+        val offsetDescription = createRefFor("offsetDescription")
+        val plus = createRefFor("plus")
+        val plusTarget = createRefFor("plusTarget")
+        val midDescription = createRefFor("midDescription")
+
+        fun ConstrainScope.topBotLinkToParent(topMargin: Dp = 12.dp, bottomMargin: Dp = 8.dp) {
+            top.linkTo(parent.top, topMargin)
+            bottom.linkTo(parent.bottom, bottomMargin)
+        }
+
+        constrain(alarmTime) {
+            topBotLinkToParent()
+            start.linkTo(parent.start)
+        }
+
+        constrain(plus) {
+            topBotLinkToParent()
+            end.linkTo(parent.end)
+        }
+
+        constrain(offsetDescription) {
+            topBotLinkToParent()
+            end.linkTo(plus.start, 4.dp)
+        }
+
+        constrain(midDescription) {
+            topBotLinkToParent()
+            start.linkTo(offsetDescription.start)
+            end.linkTo(offsetDescription.end)
+        }
+
+        constrain(minus) {
+            topBotLinkToParent()
+            end.linkTo(offsetDescription.start, 4.dp)
+        }
+
+        constrain(plusTarget) {
+            topBotLinkToParent(0.dp, 0.dp)
+            end.linkTo(parent.end)
+            start.linkTo(midDescription.end)
+            width = Dimension.fillToConstraints
+            height = Dimension.fillToConstraints
+        }
+
+        constrain(minusTarget) {
+            topBotLinkToParent(0.dp, 0.dp)
+            start.linkTo(minus.start)
+            end.linkTo(midDescription.start)
+            width = Dimension.fillToConstraints
+            height = Dimension.fillToConstraints
         }
     }
 }
@@ -231,7 +238,7 @@ private fun getPreviewCalarmModel(hasAlarm: Boolean = true): CalarmModel =
 @Composable
 fun PreviewEventRowUnselected() {
     CalarmTheme {
-        EventRow(getPreviewCalarmModel(false))
+        EventCard(getPreviewCalarmModel(false))
     }
 }
 
@@ -239,6 +246,6 @@ fun PreviewEventRowUnselected() {
 @Composable
 fun PreviewEventRowSelected() {
     CalarmTheme {
-        EventRow(getPreviewCalarmModel())
+        EventCard(getPreviewCalarmModel())
     }
 }

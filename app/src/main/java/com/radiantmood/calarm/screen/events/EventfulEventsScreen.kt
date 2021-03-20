@@ -2,6 +2,7 @@ package com.radiantmood.calarm.screen.events
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -10,15 +11,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.radiantmood.calarm.compose.SectionTitle
 
+@Composable
+fun EventfulEventsScreen(screenModel: EventsScreenModel.Eventful) {
+    if (screenModel.showDebugAlarmButton) DebugAlarmButton()
+    LazyColumn {
+        item { EventScreenTopBar() }
+        item { EventfulHeader(screenModel) }
+        EventsList(screenModel.eventModels, screenModel.tmoEventModels, screenModel.unmappedAlarms)
+    }
+}
+
 fun LazyListScope.EventsList(eventList: List<CalarmModel>, tmoEventList: List<CalarmModel>, alarmList: List<UnmappedAlarmModel>) {
     SectionTitle(eventList.isNotEmpty(), "Today", Modifier.padding(16.dp))
     items(eventList) { model ->
-        EventRow(model)
+        EventCard(model)
         EventBottomSpacer(model.event.doesNextEventOverlap)
     }
     SectionTitle(tmoEventList.isNotEmpty(), "Tomorrow", Modifier.padding(16.dp))
     items(tmoEventList) { model ->
-        EventRow(model)
+        EventCard(model)
         EventBottomSpacer(model.event.doesNextEventOverlap)
     }
     SectionTitle(alarmList.isNotEmpty(), "Unmapped Alarms", Modifier.padding(16.dp))
