@@ -103,7 +103,7 @@ class EventsViewModel : ViewModel() {
         val tmoEventModels = tmoEvents.mapIndexed { index, event ->
             val previouslyProcessed = processedEventIds.contains(event.eventId)
             processedEventIds.add(event.eventId)
-            createCalarmModel(event, tmoEvents.getOrNull(index + 1), previouslyProcessed, headerBuilder)
+            createCalarmModel(event, tmoEvents.getOrNull(index + 1), previouslyProcessed)
         }
         val unmappedAlarmModels = alarmRepo.queryAlarms()
             .filter { !eventIds.contains(it.eventId) }

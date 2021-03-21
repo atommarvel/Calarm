@@ -16,7 +16,7 @@ fun EventfulEventsScreen(screenModel: EventsScreenModel.Eventful) {
     if (screenModel.showDebugAlarmButton) DebugAlarmButton()
     LazyColumn {
         item { EventScreenTopBar() }
-        item { EventfulHeader(screenModel) }
+        item { EventfulHeader(screenModel.header) }
         EventsList(screenModel.eventModels, screenModel.tmoEventModels, screenModel.unmappedAlarms)
     }
 }
