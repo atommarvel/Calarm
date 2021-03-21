@@ -13,7 +13,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.radiantmood.calarm.ui.theme.CalarmTheme
-import com.radiantmood.calarm.util.LoremIpsum
+import com.radiantmood.calarm.util.getPreviewCalarmModel
 import java.util.*
 
 @Composable
@@ -92,27 +92,7 @@ fun CalendarDot(color: Color) {
     )
 }
 
-private fun getPreviewCalarmModel(hasAlarm: Boolean = true): CalarmModel =
-    CalarmModel(
-        event = EventModel(
-            name = LoremIpsum.Short,
-            timeRange = "11:35am - 12:00pm",
-            doesNextEventOverlap = false,
-            onToggleAlarm = { }
-        ),
-        calendar = CalendarModel(
-            name = "Schedule",
-            color = Color.Red
-        ),
-        alarm = if (hasAlarm) AlarmModel(
-            cal = Calendar.getInstance(),
-            offset = -1L,
-            onIncreaseOffset = {},
-            onDecreaseOffset = {}
-        ) else null
-    )
-
-@Preview
+@Preview(group = "light")
 @Composable
 fun PreviewEventRowUnselected() {
     CalarmTheme {
@@ -120,10 +100,26 @@ fun PreviewEventRowUnselected() {
     }
 }
 
-@Preview
+@Preview(group = "dark")
+@Composable
+fun PreviewEventRowUnselectedDark() {
+    CalarmTheme(darkTheme = true) {
+        EventCard(getPreviewCalarmModel(false))
+    }
+}
+
+@Preview(group = "light")
 @Composable
 fun PreviewEventRowSelected() {
     CalarmTheme {
+        EventCard(getPreviewCalarmModel())
+    }
+}
+
+@Preview(group = "dark")
+@Composable
+fun PreviewEventRowSelectedDark() {
+    CalarmTheme(darkTheme = true) {
         EventCard(getPreviewCalarmModel())
     }
 }

@@ -10,10 +10,12 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.*
 import com.radiantmood.calarm.util.formatTime
+import com.radiantmood.calarm.util.getPreviewCalarmModel
 import com.radiantmood.calarm.util.ref
 import kotlin.math.abs
 
@@ -21,7 +23,7 @@ import kotlin.math.abs
 fun EventCardHeader(alarm: AlarmModel) {
     Surface(color = MaterialTheme.colors.secondary) {
         ConstraintLayout(
-            eventRowHeaderConstraintSet,
+            constraintSet,
             modifier = Modifier
                 .padding(start = 16.dp)
                 .fillMaxWidth(),
@@ -38,12 +40,7 @@ fun EventCardHeader(alarm: AlarmModel) {
                     .ref(ref.minus)
                     .padding(start = 32.dp)
             )
-            val beforeAfter = if (alarm.offset > 0) "after" else "before"
-            Text(
-                text = "Ring ${abs(alarm.offset)} minutes $beforeAfter", // TODO: right on time
-                style = MaterialTheme.typography.subtitle2,
-                modifier = Modifier.ref(ref.offsetDescription)
-            )
+            OffsetDescription(alarm)
             Box(
                 Modifier
                     .width(1.dp)
@@ -71,6 +68,21 @@ fun EventCardHeader(alarm: AlarmModel) {
     }
 }
 
+@Composable
+fun OffsetDescription(alarm: AlarmModel) {
+    val label = when {
+        (alarm.offset == 0L) -> "Ring right on time"
+        (alarm.offset > 0L) -> "Ring ${abs(alarm.offset)} minutes after"
+        (alarm.offset < 0L) -> "Ring ${abs(alarm.offset)} minutes before"
+        else -> ""
+    }
+    Text(
+        text = label,
+        style = MaterialTheme.typography.subtitle2,
+        modifier = Modifier.ref(ref.offsetDescription)
+    )
+}
+
 private val ref by lazy {
     object {
         val alarmTime = ConstrainedLayoutReference("alarmTime")
@@ -83,7 +95,7 @@ private val ref by lazy {
     }
 }
 
-private val eventRowHeaderConstraintSet: ConstraintSet by lazy {
+private val constraintSet: ConstraintSet by lazy {
     ConstraintSet {
         fun ConstrainScope.topBotLinkToParent(topMargin: Dp = 12.dp, bottomMargin: Dp = 8.dp) {
             top.linkTo(parent.top, topMargin)
@@ -131,5 +143,13 @@ private val eventRowHeaderConstraintSet: ConstraintSet by lazy {
             width = Dimension.fillToConstraints
             height = Dimension.fillToConstraints
         }
+    }
+}
+
+@Preview
+@Composable
+fun EventCardHeaderPreview() {
+    MaterialTheme {
+        EventCardHeader(getPreviewCalarmModel(true).alarm!!)
     }
 }
