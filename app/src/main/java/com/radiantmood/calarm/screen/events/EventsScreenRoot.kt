@@ -21,8 +21,10 @@ val LocalEventsViewModel = compositionLocalOf<EventsViewModel> { error("No Event
 @Composable
 fun EventsScreenRoot() {
     if (LocalPermissionsUtil.current.checkPermissions(LocalNavController.current)) return
-    val eventsViewModel: EventsViewModel = viewModel()
-    eventsViewModel.getData()
+    val eventsViewModel = viewModel<EventsViewModel>().apply {
+        getData()
+        autoRefresh()
+    }
     CompositionLocalProvider(
         LocalAppBarTitle provides "Calarms", // TODO: Strings -> resource ids
         LocalEventsViewModel provides eventsViewModel

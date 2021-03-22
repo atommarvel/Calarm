@@ -1,16 +1,23 @@
 package com.radiantmood.calarm.screen.events
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.radiantmood.calarm.repo.*
+import com.radiantmood.calarm.repo.AlarmRepository
+import com.radiantmood.calarm.repo.EventRepository
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
+import com.radiantmood.calarm.repo.SelectedCalendarsRepository
+import com.radiantmood.calarm.repo.UserAlarm
 import com.radiantmood.calarm.screen.LoadingModelContainer
 import com.radiantmood.calarm.screen.ModelContainer
 import com.radiantmood.calarm.util.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -22,7 +29,7 @@ class EventsViewModel : ViewModel() {
 
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
     private val eventRepo = EventRepository()
-    private val calendarRepo = CalendarRepository()
+    private val refreshMutex = Mutex()
 
     // TODO: group alarm classes into a manager?
     private val alarmRepo = AlarmRepository()
@@ -78,7 +85,7 @@ class EventsViewModel : ViewModel() {
             }
         }
 
-        fun produceHeader() = EventfulHeader(firstAlarm, "$alarmCount Calarms left today")
+        fun produceHeader() = EventfulHeader(firstAlarm, if (alarmCount > 0) "$alarmCount Calarms left today" else null)
     }
 
     /**
@@ -121,6 +128,20 @@ class EventsViewModel : ViewModel() {
             isDebugMode
         )
         _eventsScreen.postValue(model)
+    }
+
+    fun autoRefresh() {
+        viewModelScope.launch {
+            if (!refreshMutex.isLocked) {
+                refreshMutex.withLock {
+                    while (true) {
+                        delay(TimeUnit.MINUTES.toMillis(1))
+                        Log.i(TAG, "autoRefresh")
+                        getData()
+                    }
+                }
+            }
+        }
     }
 
     private fun createUnmappedAlarmModel(it: UserAlarm) =

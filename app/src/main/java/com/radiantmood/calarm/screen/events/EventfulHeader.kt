@@ -18,25 +18,35 @@ import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-// TODO: no alarm set
 @Composable
 fun EventfulHeader(header: EventfulHeader) {
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
         UpNext(header.nextAlarmStart)
-        Spacer(modifier = Modifier.height(14.dp))
-        header.alarmsLeft?.let { Text(it, style = MaterialTheme.typography.h3) }
-        Spacer(modifier = Modifier.height(10.dp))
+        AlarmsLeft(header.alarmsLeft)
     }
 }
 
 @Composable
 fun UpNext(nextAlarmStart: Calendar?) {
-    val countDown = countDownProducer(nextAlarmStart)
-    Column {
-        Text(countDown.value, style = MaterialTheme.typography.h3)
-        nextAlarmStart?.formatTime()?.let { Text("until the next Calarm at $it", style = MaterialTheme.typography.body1) }
+    nextAlarmStart?.let {
+        val countDown = countDownProducer(nextAlarmStart)
+        Column {
+            Text(countDown.value, style = MaterialTheme.typography.h3)
+            Text("until the next Calarm at ${nextAlarmStart.formatTime()}", style = MaterialTheme.typography.body1)
+            Spacer(modifier = Modifier.height(14.dp))
+        }
+    }
+}
+
+@Composable
+fun AlarmsLeft(alarmsLeft: String?) {
+    alarmsLeft?.let {
+        Column {
+            Text(alarmsLeft, style = MaterialTheme.typography.h3)
+            Spacer(modifier = Modifier.height(10.dp))
+        }
     }
 }
 
