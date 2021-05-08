@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -41,12 +42,15 @@ fun LazyListScope.EventsList(eventList: List<CalarmModel>, tmoEventList: List<Ca
 @Composable
 fun EventBottomSpacer(doesNextEventOverlap: Boolean) {
     if (doesNextEventOverlap) {
-        Box(
-            modifier = Modifier
-                .height(18.dp)
-                .width(1.dp)
-                .background(color = Color.Black.copy(alpha = 0.38f))
-        )
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .height(18.dp)
+                    .width(1.dp)
+                    .background(color = Color.White.copy(alpha = 0.38f))
+                    .align(Alignment.Center)
+            )
+        }
     } else {
         Spacer(modifier = Modifier.height(18.dp))
     }
