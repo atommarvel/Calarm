@@ -1,5 +1,6 @@
 package com.radiantmood.calarm.screen.events
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -14,14 +15,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.radiantmood.calarm.ui.theme.CalarmTheme
 import com.radiantmood.calarm.util.getPreviewCalarmModel
-import java.util.*
 
 @Composable
 fun EventCard(model: CalarmModel) {
     val rowModifier = Modifier.padding(horizontal = 16.dp)
     Card(
         elevation = 4.dp,
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .animateContentSize()
     ) {
         Column {
             model.alarm?.let {
