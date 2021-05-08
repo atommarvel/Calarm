@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,11 +46,17 @@ fun PermissionScreen() {
             Spacer(modifier = Modifier.height(32.dp))
         }
         if (!permissionsUtil.isOverlayPermissionGranted()) {
-            Text(text = "We need to be show an alarm even if the phone screen is locked.", textAlign = TextAlign.Center)
+            Text(text = "We need to be able to show an alarm even if the phone screen is locked.", textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = { permissionsUtil.requestOverlayPermission() }) {
                 Text(text = "Grant Overlay Permission")
             }
+        }
+    }
+
+    SideEffect {
+        if (permissionsUtil.arePermissionsGranted()) {
+            navController.popBackStack()
         }
     }
 }
