@@ -9,6 +9,11 @@ private fun getTimeFormat() = SimpleDateFormat(timePattern, Locale.getDefault())
 
 fun CalendarAtTime(timeInMilliseconds: Long) = Calendar.getInstance().apply { timeInMillis = timeInMilliseconds }
 
+fun CalendarAt(hour: Int, minute: Int) = Calendar.getInstance().atStartOfDay().apply {
+    set(Calendar.HOUR_OF_DAY, hour)
+    set(Calendar.MINUTE, minute)
+}
+
 fun Calendar.atStartOfDay() = apply {
     set(Calendar.HOUR_OF_DAY, 0)
     set(Calendar.MINUTE, 0)
@@ -38,3 +43,5 @@ fun getLateNightCalendar() = Calendar.getInstance().apply {
     set(Calendar.HOUR_OF_DAY, 23)
     set(Calendar.MINUTE, 59)
 }
+
+fun getHour(timeInMilliseconds: Long): Int = CalendarAtTime(timeInMilliseconds).get(Calendar.HOUR_OF_DAY)

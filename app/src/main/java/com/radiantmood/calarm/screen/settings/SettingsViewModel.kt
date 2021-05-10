@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.radiantmood.calarm.repo.CalendarRepository
+import com.radiantmood.calarm.repo.DailyNotifRepo
 import com.radiantmood.calarm.repo.SelectedCalendarsRepository
 import com.radiantmood.calarm.screen.LoadingModelContainer
 import com.radiantmood.calarm.screen.ModelContainer
@@ -26,7 +27,12 @@ class SettingsViewModel : ViewModel() {
     }
 
     private suspend fun postUpdate() {
-        _settingsScreen.postValue(SettingsScreenModel(getSelectedCalendars()))
+        _settingsScreen.postValue(
+            SettingsScreenModel(
+                selectedCalendars = getSelectedCalendars(),
+                dailyNotifTime = DailyNotifRepo.getDailyNotifTime()
+            )
+        )
     }
 
     private suspend fun getSelectedCalendars(): List<CalendarSelectionModel> {
@@ -44,6 +50,17 @@ class SettingsViewModel : ViewModel() {
             // TODO: should we cancel all related alarms?
             selectedCalendarsRepo.remove(id)
         } else selectedCalendarsRepo.add(id)
+        postUpdate()
+    }
+
+    fun toggleDailyNotifs() = viewModelScope.launch {
+        DailyNotifRepo.toggleIsDailyNotifEnabled()
+        postUpdate()
+    }
+
+    fun setDailyNotificationHour(hour: Int, minute: Int) = viewModelScope.launch {
+        DailyNotifRepo.setDailyNotifHour(hour)
+        DailyNotifRepo.setDailyNotifMinute(minute)
         postUpdate()
     }
 }
