@@ -37,6 +37,7 @@ fun PermissionScreen() {
     Fullscreen {
         Text(text = "Missing Permissions", fontSize = 24.sp, textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(32.dp))
+        // TODO: ask to lift battery restrictions
         if (!permissionsUtil.isCalendarPermissionGranted()) {
             Text(text = "We need to be able to see calendar events to assign alarms to.", textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(16.dp))
