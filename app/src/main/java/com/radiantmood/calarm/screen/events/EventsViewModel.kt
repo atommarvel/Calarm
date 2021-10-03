@@ -38,7 +38,7 @@ class EventsViewModel : ViewModel() {
     }
 
     fun toggleAlarm(event: CalEvent, eventPart: EventPart) = viewModelScope.launch {
-        val alarm = alarmRepo.getForEvent(event.eventId, eventPart)
+        val alarm = alarmRepo.getForEvent(eventPart + event.eventId)
         if (alarm != null) {
             cancelAlarm(alarm)
         } else scheduleAlarm(event.eventId, eventPart.getTargetCal(event), event.title, eventPart)
@@ -63,7 +63,7 @@ class EventsViewModel : ViewModel() {
 
     fun cancelAlarm(alarm: UserAlarm) {
         viewModelScope.launch {
-            alarmRepo.remove(alarm.eventId, alarm.eventPart)
+            alarmRepo.remove(alarm.eventPart + alarm.eventId)
             alarmUtil.cancelAlarm(alarm)
             getData()
         }
@@ -156,7 +156,7 @@ class EventsViewModel : ViewModel() {
         val alarms = if (!previouslyProcessed) alarmRepo.getAllForEvent(event.eventId) else emptyList()
         val alarmModels = alarms.map { alarm ->
             headerBuilder?.consumeAlarm(alarm)
-            val offsetMillis = alarm.calendar.timeInMillis - event.start.timeInMillis
+            val offsetMillis = alarm.calendar.timeInMillis - alarm.eventPart.getTargetCal(event).timeInMillis
             val offsetMinutes = TimeUnit.MILLISECONDS.toMinutes(offsetMillis)
             AlarmModel(
                 cal = alarm.calendar,

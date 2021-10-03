@@ -16,8 +16,8 @@ class AlarmRepository {
     }
 
     @WorkerThread
-    suspend fun getForEvent(eventId: Int, eventPart: EventPart) = withContext(Dispatchers.Default) {
-        dao.findByEventId(eventId, eventPart)
+    suspend fun getForEvent(alarmId: String) = withContext(Dispatchers.Default) {
+        dao.findByAlarmId(alarmId)
     }
 
     @WorkerThread
@@ -31,8 +31,8 @@ class AlarmRepository {
     }
 
     @WorkerThread
-    suspend fun remove(eventId: Int, eventPart: EventPart) = withContext(Dispatchers.Default) {
-        getForEvent(eventId, eventPart)?.let { dao.delete(it) }
+    suspend fun remove(alarmId: String) = withContext(Dispatchers.Default) {
+        getForEvent(alarmId)?.let { dao.delete(it) }
     }
 }
 
@@ -61,8 +61,8 @@ interface AlarmDao {
     @Query("SELECT * FROM UserAlarm")
     suspend fun getAll(): List<UserAlarm>
 
-    @Query("SELECT * FROM UserAlarm WHERE eventId LIKE :id AND eventPart like :part LIMIT 1")
-    suspend fun findByEventId(id: Int, part: EventPart): UserAlarm?
+    @Query("SELECT * FROM UserAlarm WHERE alarmId LIKE :alarmId LIMIT 1")
+    suspend fun findByAlarmId(alarmId: String): UserAlarm?
 
     @Query("SELECT * FROM UserAlarm WHERE eventId LIKE :id")
     suspend fun findAllByEventId(id: Int): List<UserAlarm>

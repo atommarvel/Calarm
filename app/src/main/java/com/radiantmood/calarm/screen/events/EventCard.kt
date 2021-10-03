@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.radiantmood.calarm.repo.EventPart
 import com.radiantmood.calarm.ui.theme.CalarmTheme
 import com.radiantmood.calarm.util.getPreviewCalarmModel
 
@@ -49,12 +48,16 @@ fun EventCard(model: CalarmModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 EventLabel(label = model.event.name, modifier = Modifier.weight(1f))
-                IconToggleButton(checked = model.alarms.firstOrNull { it.eventPart == EventPart.START } != null,
-                    onCheckedChange = { model.event.onToggleAlarmStart() }) {
+                AlarmToggleButton(
+                    checked = model.startAlarm != null,
+                    onCheckedChange = { model.event.onToggleAlarmStart() }
+                ) {
                     Icon(imageVector = Icons.Default.ArrowUpward, contentDescription = "Toggle event start alarm")
                 }
-                IconToggleButton(checked = model.alarms.firstOrNull { it.eventPart == EventPart.END } != null,
-                    onCheckedChange = { model.event.onToggleAlarmEnd() }) {
+                AlarmToggleButton(
+                    checked = model.endAlarm != null,
+                    onCheckedChange = { model.event.onToggleAlarmEnd() }
+                ) {
                     Icon(imageVector = Icons.Default.ArrowDownward, contentDescription = "Toggle event end alarm")
                 }
             }
@@ -63,6 +66,19 @@ fun EventCard(model: CalarmModel) {
             model.endAlarm?.let {
                 EventCardHeader(it)
             }
+        }
+    }
+}
+
+@Composable
+fun AlarmToggleButton(checked: Boolean, onCheckedChange: (Boolean) -> Unit, content: @Composable () -> Unit) {
+    val color = if (checked) MaterialTheme.colors.secondary else MaterialTheme.colors.surface
+    IconToggleButton(
+        checked = checked,
+        onCheckedChange = onCheckedChange
+    ) {
+        Surface(color = color, shape = CircleShape) {
+            content()
         }
     }
 }
