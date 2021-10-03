@@ -1,9 +1,9 @@
 package com.radiantmood.calarm
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
-import androidx.navigation.compose.NamedNavArgument
 import com.radiantmood.calarm.screen.PermissionsScreenRoot
 import com.radiantmood.calarm.screen.calendars.CalendarsSelectionScreenRoot
 import com.radiantmood.calarm.screen.events.EventsScreenRoot

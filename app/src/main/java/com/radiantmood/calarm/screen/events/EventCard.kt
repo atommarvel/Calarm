@@ -5,6 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -13,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.radiantmood.calarm.repo.EventPart
 import com.radiantmood.calarm.ui.theme.CalarmTheme
 import com.radiantmood.calarm.util.getPreviewCalarmModel
 
@@ -26,8 +30,8 @@ fun EventCard(model: CalarmModel) {
             .animateContentSize()
     ) {
         Column {
-            model.alarm?.let {
-                EventCardHeader(model.alarm)
+            model.startAlarm?.let {
+                EventCardHeader(it)
             }
             Spacer(Modifier.height(12.dp))
             Row(
@@ -45,10 +49,20 @@ fun EventCard(model: CalarmModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 EventLabel(label = model.event.name, modifier = Modifier.weight(1f))
-                Switch(checked = model.alarm != null, onCheckedChange = { model.event.onToggleAlarm() })
+                IconToggleButton(checked = model.alarms.firstOrNull { it.eventPart == EventPart.START } != null,
+                    onCheckedChange = { model.event.onToggleAlarmStart() }) {
+                    Icon(imageVector = Icons.Default.ArrowUpward, contentDescription = "Toggle event start alarm")
+                }
+                IconToggleButton(checked = model.alarms.firstOrNull { it.eventPart == EventPart.END } != null,
+                    onCheckedChange = { model.event.onToggleAlarmEnd() }) {
+                    Icon(imageVector = Icons.Default.ArrowDownward, contentDescription = "Toggle event end alarm")
+                }
             }
             model.event.debugData?.let { Row { Text(it) } }
             Spacer(Modifier.height(12.dp))
+            model.endAlarm?.let {
+                EventCardHeader(it)
+            }
         }
     }
 }

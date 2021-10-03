@@ -11,6 +11,10 @@ object DailyNotifRepo {
         PrefsRepo.isDailyNotifEnabled = PrefsRepo.isDailyNotifEnabled != true
     }
 
+    fun updateScheduledNotification() {
+
+    }
+
     fun getDailyNotifTime(): Calendar? =
         if (isDailyNotifEnabled()) {
             val hour = PrefsRepo.dailyNotifHour ?: 9L

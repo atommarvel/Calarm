@@ -1,5 +1,6 @@
 package com.radiantmood.calarm.util
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -7,6 +8,7 @@ import android.content.Intent
 import android.widget.Toast
 import com.radiantmood.calarm.activity.AlarmExperienceActivity
 import com.radiantmood.calarm.calarm
+import com.radiantmood.calarm.repo.EventPart
 import com.radiantmood.calarm.repo.UserAlarm
 import java.io.Serializable
 
@@ -28,6 +30,7 @@ class AlarmUtil {
         am.cancel(pIntent)
     }
 
+    @SuppressLint("WrongConstant")
     private fun createPendingIntent(userAlarm: UserAlarm): PendingIntent {
         val intent = Intent(calarm, AlarmExperienceActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -37,14 +40,14 @@ class AlarmUtil {
         return PendingIntent.getActivity(calarm, userAlarm.eventId, intent, pIntentFlags)
     }
 
-    data class AlarmIntentData(val title: String, val eventId: Int) : Serializable {
+    data class AlarmIntentData(val title: String, val eventId: Int, val eventPart: EventPart) : Serializable {
 
         fun putInIntent(intent: Intent) = intent.putExtra(key, this)
 
         companion object {
             private const val key = "ALARM_INTENT_DATA"
             fun fromIntent(intent: Intent): AlarmIntentData? = intent.getSerializableExtra(key) as? AlarmIntentData
-            fun fromUserAlarm(userAlarm: UserAlarm) = AlarmIntentData(userAlarm.title, userAlarm.eventId)
+            fun fromUserAlarm(userAlarm: UserAlarm) = AlarmIntentData(userAlarm.title, userAlarm.eventId, userAlarm.eventPart)
         }
     }
 

@@ -40,7 +40,7 @@ class AlarmExperienceViewModel : ViewModel() {
 
     private fun deleteAlarm(alarmIntentData: AlarmIntentData?) = viewModelScope.launch {
         try {
-            alarmIntentData?.eventId?.let { alarmRepo.remove(it) }
+            alarmIntentData?.let { alarmRepo.remove(it.eventId, it.eventPart) }
         } catch (e: Exception) {
             // Do nothing. We will reconcile it later if needed.
         }

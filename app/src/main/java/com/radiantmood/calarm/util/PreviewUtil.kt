@@ -1,6 +1,7 @@
 package com.radiantmood.calarm.util
 
 import androidx.compose.ui.graphics.Color
+import com.radiantmood.calarm.repo.EventPart
 import com.radiantmood.calarm.screen.events.AlarmModel
 import com.radiantmood.calarm.screen.events.CalarmModel
 import com.radiantmood.calarm.screen.events.CalendarModel
@@ -20,16 +21,20 @@ fun getPreviewCalarmModel(hasAlarm: Boolean = true): CalarmModel =
             name = LoremIpsum.Short,
             timeRange = "11:35am - 12:00pm",
             doesNextEventOverlap = false,
-            onToggleAlarm = { }
+            onToggleAlarmStart = { },
+            onToggleAlarmEnd = { },
         ),
         calendar = CalendarModel(
             name = "Schedule",
             color = Color.Red
         ),
-        alarm = if (hasAlarm) AlarmModel(
-            cal = Calendar.getInstance(),
-            offset = -1L,
-            onIncreaseOffset = {},
-            onDecreaseOffset = {}
-        ) else null
+        alarms = if (hasAlarm) listOf(
+            AlarmModel(
+                cal = Calendar.getInstance(),
+                offset = -1L,
+                eventPart = EventPart.START,
+                onIncreaseOffset = {},
+                onDecreaseOffset = {},
+            )
+        ) else emptyList()
     )

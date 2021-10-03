@@ -150,6 +150,6 @@ private val constraintSet: ConstraintSet by lazy {
 @Composable
 fun EventCardHeaderPreview() {
     MaterialTheme {
-        EventCardHeader(getPreviewCalarmModel(true).alarm!!)
+        EventCardHeader(getPreviewCalarmModel(true).startAlarm!!)
     }
 }

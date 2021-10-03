@@ -16,8 +16,13 @@ class AlarmRepository {
     }
 
     @WorkerThread
-    suspend fun getForEvent(eventId: Int) = withContext(Dispatchers.Default) {
-        dao.findByEventId(eventId)
+    suspend fun getForEvent(eventId: Int, eventPart: EventPart) = withContext(Dispatchers.Default) {
+        dao.findByEventId(eventId, eventPart)
+    }
+
+    @WorkerThread
+    suspend fun getAllForEvent(eventId: Int): List<UserAlarm> = withContext(Dispatchers.Default) {
+        dao.findAllByEventId(eventId)
     }
 
     @WorkerThread
@@ -26,16 +31,29 @@ class AlarmRepository {
     }
 
     @WorkerThread
-    suspend fun remove(eventId: Int) = withContext(Dispatchers.Default) {
-        getForEvent(eventId)?.let { dao.delete(it) }
+    suspend fun remove(eventId: Int, eventPart: EventPart) = withContext(Dispatchers.Default) {
+        getForEvent(eventId, eventPart)?.let { dao.delete(it) }
     }
+}
+
+enum class EventPart {
+    START, END;
+
+    fun getTargetCal(calEvent: EventRepository.CalEvent) = when (this) {
+        START -> calEvent.start
+        END -> calEvent.end
+    }
+
+    operator fun plus(eventId: Int): String = eventId.toString() + this.name
 }
 
 @Entity
 data class UserAlarm(
-    @PrimaryKey val eventId: Int,
+    @PrimaryKey val alarmId: String,
+    val eventId: Int,
     val calendar: Calendar,
-    val title: String
+    val title: String,
+    val eventPart: EventPart
 )
 
 @Dao
@@ -43,8 +61,11 @@ interface AlarmDao {
     @Query("SELECT * FROM UserAlarm")
     suspend fun getAll(): List<UserAlarm>
 
-    @Query("SELECT * FROM UserAlarm WHERE eventId LIKE :id LIMIT 1")
-    suspend fun findByEventId(id: Int): UserAlarm?
+    @Query("SELECT * FROM UserAlarm WHERE eventId LIKE :id AND eventPart like :part LIMIT 1")
+    suspend fun findByEventId(id: Int, part: EventPart): UserAlarm?
+
+    @Query("SELECT * FROM UserAlarm WHERE eventId LIKE :id")
+    suspend fun findAllByEventId(id: Int): List<UserAlarm>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(vararg alarms: UserAlarm)

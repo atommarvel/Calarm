@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.radiantmood.calarm.repo.EventPart
 import com.radiantmood.calarm.util.getDebugEvent
 import com.radiantmood.calarm.util.getFutureCalendar
 
@@ -19,7 +20,7 @@ fun DebugAlarmButton() {
     val vm = LocalEventsViewModel.current
     Button({
         val event = getDebugEvent(getFutureCalendar(secondsInFuture = 10))
-        vm.scheduleAlarm(event.eventId, event.start, event.title)
+        vm.scheduleAlarm(event.eventId, event.start, event.title, EventPart.START)
     }) {
         Text("Schedule alarm 20 seconds from now")
     }

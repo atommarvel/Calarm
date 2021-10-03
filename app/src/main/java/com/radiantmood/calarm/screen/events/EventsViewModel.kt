@@ -6,11 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.radiantmood.calarm.repo.AlarmRepository
-import com.radiantmood.calarm.repo.EventRepository
+import com.radiantmood.calarm.repo.*
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
-import com.radiantmood.calarm.repo.SelectedCalendarsRepository
-import com.radiantmood.calarm.repo.UserAlarm
 import com.radiantmood.calarm.screen.LoadingModelContainer
 import com.radiantmood.calarm.screen.ModelContainer
 import com.radiantmood.calarm.util.*
@@ -40,24 +37,24 @@ class EventsViewModel : ViewModel() {
         getData()
     }
 
-    fun toggleAlarm(event: CalEvent) = viewModelScope.launch {
-        val alarm = alarmRepo.getForEvent(event.eventId)
+    fun toggleAlarm(event: CalEvent, eventPart: EventPart) = viewModelScope.launch {
+        val alarm = alarmRepo.getForEvent(event.eventId, eventPart)
         if (alarm != null) {
             cancelAlarm(alarm)
-        } else scheduleAlarm(event.eventId, event.start, event.title)
+        } else scheduleAlarm(event.eventId, eventPart.getTargetCal(event), event.title, eventPart)
     }
 
-    fun updateAlarmOffset(alarm: UserAlarm?, offsetChangeMinutes: Int) = viewModelScope.launch {
+    fun updateAlarmOffset(alarm: UserAlarm?, offsetChangeMinutes: Int, eventPart: EventPart) = viewModelScope.launch {
         if (alarm != null) {
             alarmUtil.cancelAlarm(alarm)
             val calendar = CalendarAtTime(alarm.calendar.timeInMillis + TimeUnit.MINUTES.toMillis(offsetChangeMinutes.toLong()))
-            scheduleAlarm(alarm.eventId, calendar, alarm.title)
+            scheduleAlarm(alarm.eventId, calendar, alarm.title, eventPart)
         }
     }
 
-    fun scheduleAlarm(eventId: Int, start: Calendar, title: String) {
+    fun scheduleAlarm(eventId: Int, start: Calendar, title: String, eventPart: EventPart) {
         viewModelScope.launch {
-            val alarm = UserAlarm(eventId, start, title)
+            val alarm = UserAlarm(eventPart + eventId, eventId, start, title, eventPart)
             alarmRepo.add(alarm)
             alarmUtil.scheduleAlarm(alarm)
             getData()
@@ -66,7 +63,7 @@ class EventsViewModel : ViewModel() {
 
     fun cancelAlarm(alarm: UserAlarm) {
         viewModelScope.launch {
-            alarmRepo.remove(alarm.eventId)
+            alarmRepo.remove(alarm.eventId, alarm.eventPart)
             alarmUtil.cancelAlarm(alarm)
             getData()
         }
@@ -156,38 +153,37 @@ class EventsViewModel : ViewModel() {
         previouslyProcessed: Boolean = false,
         headerBuilder: HeaderBuilder? = null
     ): CalarmModel {
-        val alarm =
-            if (!previouslyProcessed) alarmRepo.getForEvent(event.eventId) else null // TODO: reject alarm if it is 24 hr off (aka it's a daily recurring event)
-        headerBuilder?.consumeAlarm(alarm)
-        EventDisplay(event, alarm)
-        val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
-        val offsetMillis = (alarm?.calendar?.timeInMillis ?: 0) - event.start.timeInMillis
-        val offsetMinutes = TimeUnit.MILLISECONDS.toMinutes(offsetMillis)
-        val debugData = if (isDebugMode) "eventId: ${event.eventId}" else null
-        val doesNextEventOverlap = if (nextEvent != null) {
-            event.end.after(nextEvent.start)
-        } else false
-        val alarmModel = alarm?.let {
+        val alarms = if (!previouslyProcessed) alarmRepo.getAllForEvent(event.eventId) else emptyList()
+        val alarmModels = alarms.map { alarm ->
+            headerBuilder?.consumeAlarm(alarm)
+            val offsetMillis = alarm.calendar.timeInMillis - event.start.timeInMillis
+            val offsetMinutes = TimeUnit.MILLISECONDS.toMinutes(offsetMillis)
             AlarmModel(
-                cal = it.calendar,
+                cal = alarm.calendar,
                 offset = offsetMinutes,
-                onIncreaseOffset = ::updateAlarmOffset.bind(alarm, 1),
-                onDecreaseOffset = ::updateAlarmOffset.bind(alarm, -1)
+                eventPart = alarm.eventPart,
+                onIncreaseOffset = ::updateAlarmOffset.bind(alarm, 1, alarm.eventPart),
+                onDecreaseOffset = ::updateAlarmOffset.bind(alarm, -1, alarm.eventPart)
             )
         }
+
+        val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
+        val debugData = if (isDebugMode) "eventId: ${event.eventId}" else null
+        val doesNextEventOverlap = if (nextEvent != null) event.end.after(nextEvent.start) else false
         return CalarmModel(
             event = EventModel(
                 name = event.title,
                 timeRange = timeRange,
                 doesNextEventOverlap = doesNextEventOverlap,
                 debugData = debugData,
-                onToggleAlarm = ::toggleAlarm.bind(event)
+                onToggleAlarmStart = ::toggleAlarm.bind(event, EventPart.START),
+                onToggleAlarmEnd = ::toggleAlarm.bind(event, EventPart.END),
             ),
             calendar = CalendarModel(
                 name = event.calName,
                 color = Color(event.calColorInt)
             ),
-            alarm = alarmModel
+            alarms = alarmModels
         )
     }
 }

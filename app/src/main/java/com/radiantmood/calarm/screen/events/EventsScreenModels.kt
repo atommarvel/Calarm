@@ -1,6 +1,7 @@
 package com.radiantmood.calarm.screen.events
 
 import androidx.compose.ui.graphics.Color
+import com.radiantmood.calarm.repo.EventPart
 import com.radiantmood.calarm.repo.EventRepository
 import com.radiantmood.calarm.repo.UserAlarm
 import com.radiantmood.calarm.screen.FinishedModelContainer
@@ -11,20 +12,25 @@ data class EventDisplay(val calEvent: EventRepository.CalEvent, val userAlarm: U
 data class CalarmModel(
     val event: EventModel,
     val calendar: CalendarModel,
-    val alarm: AlarmModel?,
-)
+    val alarms: List<AlarmModel>,
+) {
+    val startAlarm: AlarmModel? get() = alarms.firstOrNull { it.eventPart == EventPart.START }
+    val endAlarm: AlarmModel? get() = alarms.firstOrNull { it.eventPart == EventPart.END }
+}
 
 data class EventModel(
     val name: String,
     val timeRange: String,
     val doesNextEventOverlap: Boolean,
     val debugData: String? = null,
-    val onToggleAlarm: () -> Unit,
+    val onToggleAlarmStart: () -> Unit,
+    val onToggleAlarmEnd: () -> Unit,
 )
 
 data class AlarmModel(
     val cal: Calendar,
     val offset: Long,
+    val eventPart: EventPart,
     val onIncreaseOffset: () -> Unit,
     val onDecreaseOffset: () -> Unit
 )
