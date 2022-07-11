@@ -4,7 +4,7 @@ import androidx.room.*
 import com.radiantmood.calarm.calarm
 import java.util.*
 
-@Database(entities = [SelectedCal::class, UserAlarm::class], version = 1)
+@Database(entities = [SelectedCal::class, UserAlarm::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun selectedCalDao(): SelectedCalDao
