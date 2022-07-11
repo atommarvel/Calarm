@@ -11,6 +11,7 @@ import com.radiantmood.calarm.calarm
 import com.radiantmood.calarm.repo.EventPart
 import com.radiantmood.calarm.repo.UserAlarm
 import java.io.Serializable
+import java.util.*
 
 
 class AlarmUtil {
@@ -37,17 +38,24 @@ class AlarmUtil {
         }
         AlarmIntentData.fromUserAlarm(userAlarm).putInIntent(intent)
         val pIntentFlags = Intent.FLAG_ACTIVITY_NEW_TASK or PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        return PendingIntent.getActivity(calarm, userAlarm.eventId, intent, pIntentFlags)
+        // TODO: generate request code better
+        return PendingIntent.getActivity(calarm, userAlarm.alarmId.hashCode(), intent, pIntentFlags)
     }
 
-    data class AlarmIntentData(val title: String, val eventId: Int, val eventPart: EventPart) : Serializable {
+    data class AlarmIntentData(val title: String, val eventId: Int, val eventPart: EventPart, val calendar: Calendar, val offsetMinutes: Int) : Serializable {
 
         fun putInIntent(intent: Intent) = intent.putExtra(key, this)
 
         companion object {
             private const val key = "ALARM_INTENT_DATA"
             fun fromIntent(intent: Intent): AlarmIntentData? = intent.getSerializableExtra(key) as? AlarmIntentData
-            fun fromUserAlarm(userAlarm: UserAlarm) = AlarmIntentData(userAlarm.title, userAlarm.eventId, userAlarm.eventPart)
+            fun fromUserAlarm(userAlarm: UserAlarm) = AlarmIntentData(
+                userAlarm.title,
+                userAlarm.eventId,
+                userAlarm.eventPart,
+                userAlarm.calendar,
+                userAlarm.offset
+            )
         }
     }
 
@@ -55,6 +63,4 @@ class AlarmUtil {
 
     // TODO: reconcile all alarms to their events to make sure there are no unmatched alarms due to event changes
     // is there a way to listen for updates in calendar events? sync adapters?
-
-    // TODO: delete alarms when they go off
 }

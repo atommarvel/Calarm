@@ -53,7 +53,8 @@ data class UserAlarm(
     val eventId: Int,
     val calendar: Calendar,
     val title: String,
-    val eventPart: EventPart
+    val eventPart: EventPart,
+    val offset: Int, // minutes away from start or end of event
 )
 
 @Dao

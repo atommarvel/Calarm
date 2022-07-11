@@ -32,6 +32,7 @@ fun CalarmTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {
+        // TODO: fix light theme
         LightColorPalette
     }
 

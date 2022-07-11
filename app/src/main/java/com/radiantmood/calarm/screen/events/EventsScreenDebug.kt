@@ -20,7 +20,7 @@ fun DebugAlarmButton() {
     val vm = LocalEventsViewModel.current
     Button({
         val event = getDebugEvent(getFutureCalendar(secondsInFuture = 10))
-        vm.scheduleAlarm(event.eventId, event.start, event.title, EventPart.START)
+        vm.scheduleAlarm(event.eventId, event.start, event.title, EventPart.START, 0)
     }) {
         Text("Schedule alarm 20 seconds from now")
     }

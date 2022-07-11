@@ -9,9 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.lifecycleScope
-import com.radiantmood.calarm.AlarmExperienceViewModel
 import com.radiantmood.calarm.compose.render
 import com.radiantmood.calarm.screen.AlarmExperienceScreen
+import com.radiantmood.calarm.screen.LoadingModelContainer
+import com.radiantmood.calarm.screen.alarm.AlarmExperienceViewModel
 
 
 class AlarmExperienceActivity : AppCompatActivity() {
@@ -23,12 +24,22 @@ class AlarmExperienceActivity : AppCompatActivity() {
         showNoMatterWhat()
         lifecycleScope.launchWhenResumed {
             vm.startExperience(intent)
-            render {
-                val title by vm.title.observeAsState("Alarm")
-                AlarmExperienceScreen(title) {
-                    vm.stopExperience()
-                    finish()
-                }
+            renderUi()
+            subscribeToEvents()
+        }
+    }
+
+    private fun renderUi() = render {
+        val uiState by vm.uiState.observeAsState(LoadingModelContainer())
+        AlarmExperienceScreen(uiState)
+    }
+
+    private fun subscribeToEvents() {
+        vm.stopExperienceEvent.observe(this@AlarmExperienceActivity) {
+            if (it == true) {
+                vm.consumeStopExperienceEvent()
+                // TODO: Find better alternative
+                finish()
             }
         }
     }

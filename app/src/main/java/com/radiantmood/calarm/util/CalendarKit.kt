@@ -32,7 +32,7 @@ fun Calendar.atEndOfDay() = apply {
     set(Calendar.AM_PM, 1)
 }
 
-fun Calendar.formatTime() = getTimeFormat().format(time).toLowerCase(Locale.getDefault())
+fun Calendar.formatTime() = getTimeFormat().format(time).lowercase(Locale.getDefault())
 
 fun getFutureCalendar(initialCalendar: Calendar? = null, secondsInFuture: Long = 0, minutesInFuture: Long = 0) = Calendar.getInstance().apply {
     val initial = initialCalendar?.timeInMillis ?: System.currentTimeMillis()

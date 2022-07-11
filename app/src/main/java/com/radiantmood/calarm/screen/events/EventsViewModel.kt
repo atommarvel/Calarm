@@ -41,20 +41,23 @@ class EventsViewModel : ViewModel() {
         val alarm = alarmRepo.getForEvent(eventPart + event.eventId)
         if (alarm != null) {
             cancelAlarm(alarm)
-        } else scheduleAlarm(event.eventId, eventPart.getTargetCal(event), event.title, eventPart)
+        } else scheduleAlarm(event.eventId, eventPart.getTargetCal(event), event.title, eventPart, 0)
     }
 
-    fun updateAlarmOffset(alarm: UserAlarm?, offsetChangeMinutes: Int, eventPart: EventPart) = viewModelScope.launch {
+    /**
+     * TODO: debounce tapping offset quickly
+     */
+    fun updateAlarmOffset(alarm: UserAlarm?, offsetChangeMinutes: Int) = viewModelScope.launch {
         if (alarm != null) {
             alarmUtil.cancelAlarm(alarm)
-            val calendar = CalendarAtTime(alarm.calendar.timeInMillis + TimeUnit.MINUTES.toMillis(offsetChangeMinutes.toLong()))
-            scheduleAlarm(alarm.eventId, calendar, alarm.title, eventPart)
+            val offsetCalendar = CalendarAtTime(alarm.calendar.timeInMillis + TimeUnit.MINUTES.toMillis(offsetChangeMinutes.toLong()))
+            scheduleAlarm(alarm.eventId, offsetCalendar, alarm.title, alarm.eventPart, alarm.offset + offsetChangeMinutes)
         }
     }
 
-    fun scheduleAlarm(eventId: Int, start: Calendar, title: String, eventPart: EventPart) {
+    fun scheduleAlarm(eventId: Int, start: Calendar, title: String, eventPart: EventPart, offset: Int) {
         viewModelScope.launch {
-            val alarm = UserAlarm(eventPart + eventId, eventId, start, title, eventPart)
+            val alarm = UserAlarm(eventPart + eventId, eventId, start, title, eventPart, offset)
             alarmRepo.add(alarm)
             alarmUtil.scheduleAlarm(alarm)
             getData()
@@ -76,7 +79,7 @@ class EventsViewModel : ViewModel() {
         fun consumeAlarm(alarm: UserAlarm?) {
             alarm?.let {
                 alarmCount++
-                if (firstAlarm == null) {
+                if (firstAlarm == null || firstAlarm?.after(alarm.calendar) == true) {
                     firstAlarm = alarm.calendar
                 }
             }
@@ -162,8 +165,8 @@ class EventsViewModel : ViewModel() {
                 cal = alarm.calendar,
                 offset = offsetMinutes,
                 eventPart = alarm.eventPart,
-                onIncreaseOffset = ::updateAlarmOffset.bind(alarm, 1, alarm.eventPart),
-                onDecreaseOffset = ::updateAlarmOffset.bind(alarm, -1, alarm.eventPart)
+                onIncreaseOffset = ::updateAlarmOffset.bind(alarm, 1),
+                onDecreaseOffset = ::updateAlarmOffset.bind(alarm, -1)
             )
         }
 

@@ -35,6 +35,7 @@ fun PermissionScreen() {
     val permissionsUtil = LocalPermissionsUtil.current
 
     Fullscreen {
+        // TODO: fix empty screen UX
         Text(text = "Missing Permissions", fontSize = 24.sp, textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(32.dp))
         // TODO: ask to lift battery restrictions

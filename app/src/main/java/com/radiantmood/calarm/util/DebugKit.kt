@@ -12,4 +12,6 @@ fun getDebugEvent(start: Calendar = getLateNightCalendar()): CalEvent {
 }
 
 fun getDebugAlarm(calEvent: CalEvent = getDebugEvent()): UserAlarm =
-    UserAlarm(EventPart.START + calEvent.eventId, calEvent.eventId, calEvent.start, calEvent.title, EventPart.START)
+    UserAlarm(EventPart.START + calEvent.eventId, calEvent.eventId, calEvent.start, calEvent.title, EventPart.START, 0)
+
+val DoNothingLambda = { /*Do Nothing*/ }

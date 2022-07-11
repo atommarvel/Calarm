@@ -3,6 +3,7 @@
     package="com.radiantmood.calarm">
 
     <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
@@ -13,7 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Calarm">
-        <activity android:name=".activity.AlarmExperienceActivity"></activity>
+        <activity
+            android:name=".activity.AlarmExperienceActivity"
+            android:exported="false"
+            android:excludeFromRecents="true" />
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
