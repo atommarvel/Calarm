@@ -136,7 +136,7 @@ class EventsViewModel : ViewModel() {
                 refreshMutex.withLock {
                     while (true) {
                         delay(TimeUnit.MINUTES.toMillis(1))
-                        Log.i(TAG, "autoRefresh")
+                        Log.i(Constants.TAG, "autoRefresh")
                         getData()
                     }
                 }

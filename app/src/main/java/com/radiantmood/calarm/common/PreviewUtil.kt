@@ -8,6 +8,10 @@ import com.radiantmood.calarm.screen.events.CalendarModel
 import com.radiantmood.calarm.screen.events.EventModel
 import java.util.*
 
+/**
+ * Helpers for common preview functionality.
+ */
+
 object LoremIpsum {
     const val Short = "Aliquam et eleifend nibh."
     const val Medium = "Phasellus ut purus non massa pretium. Maecenas condimentum metus."

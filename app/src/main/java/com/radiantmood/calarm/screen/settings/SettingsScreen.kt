@@ -83,6 +83,7 @@ fun SettingsList(screenModel: SettingsScreenModel) {
         SelectedCalendars(expanded, screenModel.selectedCalendars)
         item {
             GitHubRow()
+            // TODO: OSS atttribution
             Divider()
         }
     }

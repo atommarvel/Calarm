@@ -1,3 +1,5 @@
 package com.radiantmood.calarm.common
 
-const val TAG = "calarm"
+object Constants {
+    const val TAG = "calarm"
+}

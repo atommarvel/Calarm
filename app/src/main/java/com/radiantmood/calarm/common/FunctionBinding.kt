@@ -1,6 +1,10 @@
 package com.radiantmood.calarm.common
 
-// TODO: how big of a deal is doing this in terms of memory? Is the cleanliness worth it?
+/**
+ * Inspired by javascript's bind method.
+ *
+ * TODO: how big of a deal is doing this in terms of performance? Is the cleanliness worth it?
+ */
 
 fun <I1, O> ((I1) -> O).bind(input: I1): () -> Unit {
     return {

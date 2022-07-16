@@ -13,6 +13,7 @@ import com.markodevcic.peko.Peko
 import com.radiantmood.calarm.PermissionsScreen
 import com.radiantmood.calarm.navigate
 
+// TODO: move to official compose permission stuff. Bye Peko.
 class PermissionsUtil(private val activity: Activity) {
 
     suspend fun requestPermission(permission: String) {

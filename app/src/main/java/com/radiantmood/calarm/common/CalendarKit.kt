@@ -4,6 +4,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * Helpers for common [Calendar] manipulations.
+ */
+
 private const val timePattern = "h:mma"
 private fun getTimeFormat() = SimpleDateFormat(timePattern, Locale.getDefault())
 
