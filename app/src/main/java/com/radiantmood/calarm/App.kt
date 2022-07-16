@@ -7,7 +7,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.radiantmood.calarm.util.PermissionsUtil
+import com.radiantmood.calarm.common.PermissionsUtil
 
 val LocalPermissionsUtil = compositionLocalOf<PermissionsUtil> { error("No PermissionsKit") }
 val LocalNavController = compositionLocalOf<NavHostController> { error("No NavController") }

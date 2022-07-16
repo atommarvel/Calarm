@@ -14,9 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.*
-import com.radiantmood.calarm.util.formatTime
-import com.radiantmood.calarm.util.getPreviewCalarmModel
-import com.radiantmood.calarm.util.ref
+import com.radiantmood.calarm.common.formatTime
+import com.radiantmood.calarm.common.getPreviewCalarmModel
+import com.radiantmood.calarm.common.ref
 import kotlin.math.abs
 
 @Composable

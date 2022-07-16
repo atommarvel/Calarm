@@ -1,4 +1,4 @@
-package com.radiantmood.calarm.util
+package com.radiantmood.calarm.common
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager

@@ -1,4 +1,4 @@
-package com.radiantmood.calarm.util
+package com.radiantmood.calarm.common
 
 // TODO: how big of a deal is doing this in terms of memory? Is the cleanliness worth it?
 

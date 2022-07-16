@@ -11,7 +11,7 @@ import com.radiantmood.calarm.repo.SelectedCalendarsRepository
 import com.radiantmood.calarm.screen.LoadingModelContainer
 import com.radiantmood.calarm.screen.ModelContainer
 import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
-import com.radiantmood.calarm.util.bind
+import com.radiantmood.calarm.common.bind
 import kotlinx.coroutines.launch
 
 class SettingsViewModel : ViewModel() {

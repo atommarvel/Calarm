@@ -5,9 +5,9 @@ import android.net.Uri
 import android.provider.CalendarContract.Instances.*
 import androidx.annotation.WorkerThread
 import com.radiantmood.calarm.repo.CursorValueType.*
-import com.radiantmood.calarm.util.CalendarAtTime
-import com.radiantmood.calarm.util.atEndOfDay
-import com.radiantmood.calarm.util.atStartOfDay
+import com.radiantmood.calarm.common.CalendarAtTime
+import com.radiantmood.calarm.common.atEndOfDay
+import com.radiantmood.calarm.common.atStartOfDay
 import java.util.*
 import java.util.concurrent.TimeUnit
 

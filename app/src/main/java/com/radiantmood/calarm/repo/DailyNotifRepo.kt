@@ -1,6 +1,6 @@
 package com.radiantmood.calarm.repo
 
-import com.radiantmood.calarm.util.CalendarAt
+import com.radiantmood.calarm.common.CalendarAt
 import java.util.*
 
 object DailyNotifRepo {

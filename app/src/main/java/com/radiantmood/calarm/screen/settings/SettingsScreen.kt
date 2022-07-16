@@ -38,7 +38,7 @@ import com.radiantmood.calarm.screen.LoadingModelContainer
 import com.radiantmood.calarm.screen.ModelContainer
 import com.radiantmood.calarm.screen.calendars.CalendarRow
 import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
-import com.radiantmood.calarm.util.formatTime
+import com.radiantmood.calarm.common.formatTime
 import java.util.*
 
 val LocalSettingsScreenViewModel = compositionLocalOf<SettingsViewModel> { error("No SettingsViewModel") }

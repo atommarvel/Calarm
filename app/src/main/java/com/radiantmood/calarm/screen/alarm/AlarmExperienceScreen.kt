@@ -15,8 +15,8 @@ import com.radiantmood.calarm.compose.ButtonUiState
 import com.radiantmood.calarm.compose.Fullscreen
 import com.radiantmood.calarm.compose.ModelContainerContent
 import com.radiantmood.calarm.screen.alarm.AlarmExperienceScreenUiState
-import com.radiantmood.calarm.util.DoNothingLambda
-import com.radiantmood.calarm.util.withNonNull
+import com.radiantmood.calarm.common.DoNothingLambda
+import com.radiantmood.calarm.common.withNonNull
 
 @Preview(showBackground = true)
 @Composable

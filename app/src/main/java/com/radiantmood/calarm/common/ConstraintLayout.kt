@@ -1,4 +1,4 @@
-package com.radiantmood.calarm.util
+package com.radiantmood.calarm.common
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layoutId

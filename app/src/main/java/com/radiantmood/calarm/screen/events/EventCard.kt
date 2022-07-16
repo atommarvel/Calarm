@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.radiantmood.calarm.ui.theme.CalarmTheme
-import com.radiantmood.calarm.util.getPreviewCalarmModel
+import com.radiantmood.calarm.common.getPreviewCalarmModel
 
 @Composable
 fun EventCard(model: CalarmModel) {

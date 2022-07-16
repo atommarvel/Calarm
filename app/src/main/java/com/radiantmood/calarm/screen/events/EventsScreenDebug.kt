@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.radiantmood.calarm.repo.EventPart
-import com.radiantmood.calarm.util.getDebugEvent
-import com.radiantmood.calarm.util.getFutureCalendar
+import com.radiantmood.calarm.common.getDebugEvent
+import com.radiantmood.calarm.common.getFutureCalendar
 
 // TODO: move to settings screen
 @Composable
