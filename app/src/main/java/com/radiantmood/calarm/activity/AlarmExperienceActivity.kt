@@ -11,7 +11,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.lifecycleScope
 import com.radiantmood.calarm.compose.render
 import com.radiantmood.calarm.screen.alarm.AlarmExperienceScreen
-import com.radiantmood.calarm.screen.LoadingModelContainer
+import com.radiantmood.calarm.screen.LoadingUiStateContainer
 import com.radiantmood.calarm.screen.alarm.AlarmExperienceViewModel
 
 
@@ -30,7 +30,7 @@ class AlarmExperienceActivity : AppCompatActivity() {
     }
 
     private fun renderUi() = render {
-        val uiState by vm.uiState.observeAsState(LoadingModelContainer())
+        val uiState by vm.uiState.observeAsState(LoadingUiStateContainer())
         AlarmExperienceScreen(uiState)
     }
 

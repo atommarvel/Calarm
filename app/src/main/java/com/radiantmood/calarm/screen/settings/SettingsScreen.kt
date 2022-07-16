@@ -32,12 +32,12 @@ import com.radiantmood.calarm.CalendarSelectionScreen
 import com.radiantmood.calarm.LocalAppBarTitle
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.compose.CalarmTopAppBar
-import com.radiantmood.calarm.compose.ModelContainerContent
+import com.radiantmood.calarm.compose.UiStateContainerContent
 import com.radiantmood.calarm.navigate
-import com.radiantmood.calarm.screen.LoadingModelContainer
-import com.radiantmood.calarm.screen.ModelContainer
+import com.radiantmood.calarm.screen.LoadingUiStateContainer
+import com.radiantmood.calarm.screen.UiStateContainer
 import com.radiantmood.calarm.screen.calendars.CalendarRow
-import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
+import com.radiantmood.calarm.screen.calendars.CalendarSelectionUiState
 import com.radiantmood.calarm.common.formatTime
 import java.util.*
 
@@ -57,15 +57,15 @@ fun SettingsScreenRoot() {
 
 @Composable
 fun SettingsScreen() {
-    val modelContainer: ModelContainer<SettingsScreenModel> by LocalSettingsScreenViewModel.current.settingsScreen.observeAsState(LoadingModelContainer())
+    val uiStateContainer: UiStateContainer<SettingsScreenUiState> by LocalSettingsScreenViewModel.current.settingsScreen.observeAsState(LoadingUiStateContainer())
     Column {
         CalarmTopAppBar()
-        ModelContainerContent(modelContainer) { SettingsList(it) }
+        UiStateContainerContent(uiStateContainer) { SettingsList(it) }
     }
 }
 
 @Composable
-fun SettingsList(screenModel: SettingsScreenModel) {
+fun SettingsList(screenModel: SettingsScreenUiState) {
     // show expanded by default if there are less than 5 selected calendars
     val (expanded, setExpanded) = remember { mutableStateOf(screenModel.selectedCalendars.size < 5) }
     LazyColumn {
@@ -142,7 +142,7 @@ fun SelectedCalendarsHeader(shouldShow: Boolean, expanded: Boolean, setExpanded:
     }
 }
 
-fun LazyListScope.SelectedCalendars(shouldShow: Boolean, calendars: List<CalendarSelectionModel>) {
+fun LazyListScope.SelectedCalendars(shouldShow: Boolean, calendars: List<CalendarSelectionUiState>) {
     if (shouldShow) {
         items(calendars) { calendar ->
             Box(modifier = Modifier.padding(start = 24.dp)) {

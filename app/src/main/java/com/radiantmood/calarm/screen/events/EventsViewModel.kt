@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.radiantmood.calarm.repo.*
 import com.radiantmood.calarm.repo.EventRepository.CalEvent
-import com.radiantmood.calarm.screen.LoadingModelContainer
-import com.radiantmood.calarm.screen.ModelContainer
+import com.radiantmood.calarm.screen.LoadingUiStateContainer
+import com.radiantmood.calarm.screen.UiStateContainer
 import com.radiantmood.calarm.common.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -19,8 +19,8 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class EventsViewModel : ViewModel() {
-    private var _eventsScreen = MutableLiveData<ModelContainer<EventsScreenModel>>(LoadingModelContainer())
-    val eventsScreen: LiveData<ModelContainer<EventsScreenModel>> = _eventsScreen
+    private var _eventsScreen = MutableLiveData<UiStateContainer<EventsScreenUiState>>(LoadingUiStateContainer())
+    val eventsScreen: LiveData<UiStateContainer<EventsScreenUiState>> = _eventsScreen
 
     private var isDebugMode = false
 
@@ -120,7 +120,7 @@ class EventsViewModel : ViewModel() {
             eventModels.isEmpty() && tmoEventModels.isEmpty() -> "No events today!"
             else -> null
         }
-        val model = fullScreenMessage?.let { EventsScreenModel.FullscreenMessage(it) } ?: EventsScreenModel.Eventful(
+        val model = fullScreenMessage?.let { EventsScreenUiState.FullscreenMessage(it) } ?: EventsScreenUiState.Eventful(
             headerBuilder.produceHeader(),
             eventModels,
             tmoEventModels,
@@ -145,7 +145,7 @@ class EventsViewModel : ViewModel() {
     }
 
     private fun createUnmappedAlarmModel(it: UserAlarm) =
-        UnmappedAlarmModel(
+        UnmappedAlarmUiState(
             label = "title: \"${it.title}\"; eventId: \"${it.eventId}\" start: \"${it.calendar.formatTime()}\"",
             onRemoveAlarm = ::cancelAlarm.bind(it)
         )
@@ -155,13 +155,13 @@ class EventsViewModel : ViewModel() {
         nextEvent: CalEvent? = null,
         previouslyProcessed: Boolean = false,
         headerBuilder: HeaderBuilder? = null
-    ): CalarmModel {
+    ): CalarmUiState {
         val alarms = if (!previouslyProcessed) alarmRepo.getAllForEvent(event.eventId) else emptyList()
-        val alarmModels = alarms.map { alarm ->
+        val alarmUiStates = alarms.map { alarm ->
             headerBuilder?.consumeAlarm(alarm)
             val offsetMillis = alarm.calendar.timeInMillis - alarm.eventPart.getTargetCal(event).timeInMillis
             val offsetMinutes = TimeUnit.MILLISECONDS.toMinutes(offsetMillis)
-            AlarmModel(
+            AlarmUiState(
                 cal = alarm.calendar,
                 offset = offsetMinutes,
                 eventPart = alarm.eventPart,
@@ -173,8 +173,8 @@ class EventsViewModel : ViewModel() {
         val timeRange = "${event.start.formatTime()} - ${event.end.formatTime()}"
         val debugData = if (isDebugMode) "eventId: ${event.eventId}" else null
         val doesNextEventOverlap = if (nextEvent != null) event.end.after(nextEvent.start) else false
-        return CalarmModel(
-            event = EventModel(
+        return CalarmUiState(
+            event = EventUiState(
                 name = event.title,
                 timeRange = timeRange,
                 doesNextEventOverlap = doesNextEventOverlap,
@@ -182,11 +182,11 @@ class EventsViewModel : ViewModel() {
                 onToggleAlarmStart = ::toggleAlarm.bind(event, EventPart.START),
                 onToggleAlarmEnd = ::toggleAlarm.bind(event, EventPart.END),
             ),
-            calendar = CalendarModel(
+            calendar = CalendarUiState(
                 name = event.calName,
                 color = Color(event.calColorInt)
             ),
-            alarms = alarmModels
+            alarms = alarmUiStates
         )
     }
 }

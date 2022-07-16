@@ -27,7 +27,7 @@ fun DebugAlarmButton() {
 }
 
 @Composable
-fun UnmappedAlarmRow(unmappedAlarm: UnmappedAlarmModel) {
+fun UnmappedAlarmRow(unmappedAlarm: UnmappedAlarmUiState) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

@@ -15,8 +15,8 @@ import com.radiantmood.calarm.common.DoNothingLambda
 import com.radiantmood.calarm.common.withNonNull
 import com.radiantmood.calarm.compose.ButtonUiState
 import com.radiantmood.calarm.compose.Fullscreen
-import com.radiantmood.calarm.compose.ModelContainerContent
-import com.radiantmood.calarm.screen.ModelContainer
+import com.radiantmood.calarm.compose.UiStateContainerContent
+import com.radiantmood.calarm.screen.UiStateContainer
 
 @Preview(showBackground = true)
 @Composable
@@ -39,9 +39,9 @@ fun Preview_AlarmExperienceScreen() {
 
 @Composable
 fun AlarmExperienceScreen(
-    uiStateContainer: ModelContainer<AlarmExperienceScreenUiState>
+    uiStateContainer: UiStateContainer<AlarmExperienceScreenUiState>
 ) {
-    ModelContainerContent(uiStateContainer) { uiState ->
+    UiStateContainerContent(uiStateContainer) { uiState ->
         Fullscreen {
             with(uiState.stopUiState) {
                 label?.let {

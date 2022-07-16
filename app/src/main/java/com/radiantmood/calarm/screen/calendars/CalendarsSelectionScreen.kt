@@ -22,9 +22,9 @@ import com.radiantmood.calarm.LocalAppBarTitle
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.LocalPermissionsUtil
 import com.radiantmood.calarm.compose.CalarmTopAppBar
-import com.radiantmood.calarm.compose.ModelContainerContent
-import com.radiantmood.calarm.screen.LoadingModelContainer
-import com.radiantmood.calarm.screen.ModelContainer
+import com.radiantmood.calarm.compose.UiStateContainerContent
+import com.radiantmood.calarm.screen.LoadingUiStateContainer
+import com.radiantmood.calarm.screen.UiStateContainer
 
 val LocalCalendarsSelectionViewModel = compositionLocalOf<CalendarSelectionViewModel> { error("No CalendarSelectionViewModel") }
 
@@ -45,17 +45,17 @@ fun CalendarsSelectionScreenRoot() {
 @Composable
 fun CalendarsSelectionScreen() {
     val vm = LocalCalendarsSelectionViewModel.current
-    val modelContainer: ModelContainer<CalendarsSelectionScreenModel> by vm.calendarsScreen.observeAsState(LoadingModelContainer())
+    val uiStateContainer: UiStateContainer<CalendarsSelectionScreenUiState> by vm.calendarsScreen.observeAsState(LoadingUiStateContainer())
     Column {
         CalarmTopAppBar()
-        ModelContainerContent(modelContainer) { screenModel ->
-            CalendarList(screenModel.calendarSelectionModels)
+        UiStateContainerContent(uiStateContainer) { screenModel ->
+            CalendarList(screenModel.calendarSelectionUiStates)
         }
     }
 }
 
 @Composable
-fun CalendarList(calendars: List<CalendarSelectionModel>) {
+fun CalendarList(calendars: List<CalendarSelectionUiState>) {
     LazyColumn {
         items(calendars) { calendar ->
             CalendarRow(calendar)
@@ -65,7 +65,7 @@ fun CalendarList(calendars: List<CalendarSelectionModel>) {
 }
 
 @Composable
-fun CalendarRow(calendar: CalendarSelectionModel) {
+fun CalendarRow(calendar: CalendarSelectionUiState) {
     Row(
         modifier = Modifier
             .clickable(onClick = calendar.onCalendarToggled)

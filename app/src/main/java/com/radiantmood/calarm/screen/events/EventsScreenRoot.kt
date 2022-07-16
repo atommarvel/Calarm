@@ -12,9 +12,9 @@ import com.radiantmood.calarm.LocalAppBarTitle
 import com.radiantmood.calarm.LocalNavController
 import com.radiantmood.calarm.LocalPermissionsUtil
 import com.radiantmood.calarm.compose.Fullscreen
-import com.radiantmood.calarm.compose.ModelContainerContent
-import com.radiantmood.calarm.screen.LoadingModelContainer
-import com.radiantmood.calarm.screen.ModelContainer
+import com.radiantmood.calarm.compose.UiStateContainerContent
+import com.radiantmood.calarm.screen.LoadingUiStateContainer
+import com.radiantmood.calarm.screen.UiStateContainer
 
 val LocalEventsViewModel = compositionLocalOf<EventsViewModel> { error("No EventsViewModel") }
 
@@ -35,11 +35,11 @@ fun EventsScreenRoot() {
 
 @Composable
 fun EventsScreen() {
-    val modelContainer: ModelContainer<EventsScreenModel> by LocalEventsViewModel.current.eventsScreen.observeAsState(LoadingModelContainer())
-    ModelContainerContent(modelContainer) { screenModel ->
+    val uiStateContainer: UiStateContainer<EventsScreenUiState> by LocalEventsViewModel.current.eventsScreen.observeAsState(LoadingUiStateContainer())
+    UiStateContainerContent(uiStateContainer) { screenModel ->
         when (screenModel) {
-            is EventsScreenModel.Eventful -> EventfulEventsScreen(screenModel)
-            is EventsScreenModel.FullscreenMessage -> FullscreenMessageEventsScreen(screenModel.message)
+            is EventsScreenUiState.Eventful -> EventfulEventsScreen(screenModel)
+            is EventsScreenUiState.FullscreenMessage -> FullscreenMessageEventsScreen(screenModel.message)
         }
     }
 }

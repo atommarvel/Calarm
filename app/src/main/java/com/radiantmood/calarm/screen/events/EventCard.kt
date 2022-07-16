@@ -20,7 +20,7 @@ import com.radiantmood.calarm.ui.theme.CalarmTheme
 import com.radiantmood.calarm.common.getPreviewCalarmModel
 
 @Composable
-fun EventCard(model: CalarmModel) {
+fun EventCard(model: CalarmUiState) {
     val rowModifier = Modifier.padding(horizontal = 16.dp)
     Card(
         elevation = 4.dp,

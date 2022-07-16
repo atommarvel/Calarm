@@ -8,16 +8,16 @@ import androidx.lifecycle.viewModelScope
 import com.radiantmood.calarm.repo.CalendarRepository
 import com.radiantmood.calarm.repo.DailyNotifRepo
 import com.radiantmood.calarm.repo.SelectedCalendarsRepository
-import com.radiantmood.calarm.screen.LoadingModelContainer
-import com.radiantmood.calarm.screen.ModelContainer
-import com.radiantmood.calarm.screen.calendars.CalendarSelectionModel
+import com.radiantmood.calarm.screen.LoadingUiStateContainer
+import com.radiantmood.calarm.screen.UiStateContainer
+import com.radiantmood.calarm.screen.calendars.CalendarSelectionUiState
 import com.radiantmood.calarm.common.bind
 import kotlinx.coroutines.launch
 
 class SettingsViewModel : ViewModel() {
 
-    private var _settingsScreen = MutableLiveData<ModelContainer<SettingsScreenModel>>(LoadingModelContainer())
-    val settingsScreen: LiveData<ModelContainer<SettingsScreenModel>> = _settingsScreen
+    private var _settingsScreen = MutableLiveData<UiStateContainer<SettingsScreenUiState>>(LoadingUiStateContainer())
+    val settingsScreen: LiveData<UiStateContainer<SettingsScreenUiState>> = _settingsScreen
 
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
     private val calendarRepo = CalendarRepository()
@@ -28,19 +28,19 @@ class SettingsViewModel : ViewModel() {
 
     private suspend fun postUpdate() {
         _settingsScreen.postValue(
-            SettingsScreenModel(
+            SettingsScreenUiState(
                 selectedCalendars = getSelectedCalendars(),
                 dailyNotifTime = DailyNotifRepo.getDailyNotifTime()
             )
         )
     }
 
-    private suspend fun getSelectedCalendars(): List<CalendarSelectionModel> {
+    private suspend fun getSelectedCalendars(): List<CalendarSelectionUiState> {
         val selectedIds = selectedCalendarsRepo.getAll()
         return calendarRepo.queryCalendars()
             .filter { selectedIds.contains(it.id) }
             .map { userCal ->
-                CalendarSelectionModel(userCal.name, selectedIds.contains(userCal.id), Color(userCal.colorInt), ::toggleSelectedCalendarId.bind(userCal.id))
+                CalendarSelectionUiState(userCal.name, selectedIds.contains(userCal.id), Color(userCal.colorInt), ::toggleSelectedCalendarId.bind(userCal.id))
             }
     }
 

@@ -12,8 +12,8 @@ import com.radiantmood.calarm.calarm
 import com.radiantmood.calarm.compose.ButtonUiState
 import com.radiantmood.calarm.repo.AlarmRepository
 import com.radiantmood.calarm.repo.UserAlarm
-import com.radiantmood.calarm.screen.LoadingModelContainer
-import com.radiantmood.calarm.screen.ModelContainer
+import com.radiantmood.calarm.screen.LoadingUiStateContainer
+import com.radiantmood.calarm.screen.UiStateContainer
 import com.radiantmood.calarm.common.AlarmUtil
 import com.radiantmood.calarm.common.AlarmUtil.AlarmIntentData
 import com.radiantmood.calarm.common.bind
@@ -24,8 +24,8 @@ import kotlin.math.abs
 // TODO: try/catch everything this does
 class AlarmExperienceViewModel : ViewModel() {
 
-    private var _uiState = MutableLiveData<ModelContainer<AlarmExperienceScreenUiState>>(LoadingModelContainer())
-    val uiState: LiveData<ModelContainer<AlarmExperienceScreenUiState>> = _uiState
+    private var _uiState = MutableLiveData<UiStateContainer<AlarmExperienceScreenUiState>>(LoadingUiStateContainer())
+    val uiState: LiveData<UiStateContainer<AlarmExperienceScreenUiState>> = _uiState
 
     private var _stopExperienceEvent = MutableLiveData<Boolean?>()
     val stopExperienceEvent: LiveData<Boolean?> = _stopExperienceEvent

@@ -7,26 +7,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.radiantmood.calarm.repo.CalendarRepository
 import com.radiantmood.calarm.repo.SelectedCalendarsRepository
-import com.radiantmood.calarm.screen.LoadingModelContainer
-import com.radiantmood.calarm.screen.ModelContainer
+import com.radiantmood.calarm.screen.LoadingUiStateContainer
+import com.radiantmood.calarm.screen.UiStateContainer
 import com.radiantmood.calarm.common.bind
 import kotlinx.coroutines.launch
 
 class CalendarSelectionViewModel : ViewModel() {
-    private var _calendarsScreen = MutableLiveData<ModelContainer<CalendarsSelectionScreenModel>>(LoadingModelContainer())
-    val calendarsScreen: LiveData<ModelContainer<CalendarsSelectionScreenModel>> = _calendarsScreen
+    private var _calendarsScreen = MutableLiveData<UiStateContainer<CalendarsSelectionScreenUiState>>(LoadingUiStateContainer())
+    val calendarsScreen: LiveData<UiStateContainer<CalendarsSelectionScreenUiState>> = _calendarsScreen
 
     private val selectedCalendarsRepo = SelectedCalendarsRepository()
     private val calendarRepo = CalendarRepository()
 
     private suspend fun postCalendarUpdate() {
-        _calendarsScreen.postValue(CalendarsSelectionScreenModel(constructDisplays()))
+        _calendarsScreen.postValue(CalendarsSelectionScreenUiState(constructDisplays()))
     }
 
-    private suspend fun constructDisplays(): List<CalendarSelectionModel> {
+    private suspend fun constructDisplays(): List<CalendarSelectionUiState> {
         val selectedIds = selectedCalendarsRepo.getAll()
         return calendarRepo.queryCalendars().map { userCal ->
-            CalendarSelectionModel(userCal.name, selectedIds.contains(userCal.id), Color(userCal.colorInt), ::toggleSelectedCalendarId.bind(userCal.id))
+            CalendarSelectionUiState(userCal.name, selectedIds.contains(userCal.id), Color(userCal.colorInt), ::toggleSelectedCalendarId.bind(userCal.id))
         }
     }
 

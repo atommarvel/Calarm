@@ -2,10 +2,10 @@ package com.radiantmood.calarm.common
 
 import androidx.compose.ui.graphics.Color
 import com.radiantmood.calarm.repo.EventPart
-import com.radiantmood.calarm.screen.events.AlarmModel
-import com.radiantmood.calarm.screen.events.CalarmModel
-import com.radiantmood.calarm.screen.events.CalendarModel
-import com.radiantmood.calarm.screen.events.EventModel
+import com.radiantmood.calarm.screen.events.AlarmUiState
+import com.radiantmood.calarm.screen.events.CalarmUiState
+import com.radiantmood.calarm.screen.events.CalendarUiState
+import com.radiantmood.calarm.screen.events.EventUiState
 import java.util.*
 
 /**
@@ -19,21 +19,21 @@ object LoremIpsum {
         "Etiam placerat id ipsum sit amet rutrum. Nullam vel rhoncus urna, non malesuada ante. Integer ac odio non mauris scelerisque hendrerit ac ac purus. Duis risus purus, porttitor nec commodo at, fringilla et ex. Curabitur hendrerit accumsan nisi, blandit placerat purus sodales id."
 }
 
-fun getPreviewCalarmModel(hasAlarm: Boolean = true): CalarmModel =
-    CalarmModel(
-        event = EventModel(
+fun getPreviewCalarmModel(hasAlarm: Boolean = true): CalarmUiState =
+    CalarmUiState(
+        event = EventUiState(
             name = LoremIpsum.Short,
             timeRange = "11:35am - 12:00pm",
             doesNextEventOverlap = false,
             onToggleAlarmStart = { },
             onToggleAlarmEnd = { },
         ),
-        calendar = CalendarModel(
+        calendar = CalendarUiState(
             name = "Schedule",
             color = Color.Red
         ),
         alarms = if (hasAlarm) listOf(
-            AlarmModel(
+            AlarmUiState(
                 cal = Calendar.getInstance(),
                 offset = -1L,
                 eventPart = EventPart.START,

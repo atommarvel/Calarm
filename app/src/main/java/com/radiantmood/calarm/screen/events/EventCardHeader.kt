@@ -20,7 +20,7 @@ import com.radiantmood.calarm.common.ref
 import kotlin.math.abs
 
 @Composable
-fun EventCardHeader(alarm: AlarmModel) {
+fun EventCardHeader(alarm: AlarmUiState) {
     Surface(color = MaterialTheme.colors.secondary) {
         ConstraintLayout(
             constraintSet,
@@ -69,7 +69,7 @@ fun EventCardHeader(alarm: AlarmModel) {
 }
 
 @Composable
-fun OffsetDescription(alarm: AlarmModel) {
+fun OffsetDescription(alarm: AlarmUiState) {
     val label = when {
         (alarm.offset == 0L) -> "Ring right on time"
         (alarm.offset > 0L) -> "Ring ${abs(alarm.offset)} minutes after"

@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.radiantmood.calarm.compose.SectionTitle
 
 @Composable
-fun EventfulEventsScreen(screenModel: EventsScreenModel.Eventful) {
+fun EventfulEventsScreen(screenModel: EventsScreenUiState.Eventful) {
     if (screenModel.showDebugAlarmButton) DebugAlarmButton()
     LazyColumn {
         item { EventScreenTopBar() }
@@ -22,7 +22,7 @@ fun EventfulEventsScreen(screenModel: EventsScreenModel.Eventful) {
     }
 }
 
-fun LazyListScope.EventsList(eventList: List<CalarmModel>, tmoEventList: List<CalarmModel>, alarmList: List<UnmappedAlarmModel>) {
+fun LazyListScope.EventsList(eventList: List<CalarmUiState>, tmoEventList: List<CalarmUiState>, alarmList: List<UnmappedAlarmUiState>) {
     SectionTitle(eventList.isNotEmpty(), "Today", Modifier.padding(16.dp))
     items(eventList) { model ->
         EventCard(model)

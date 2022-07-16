@@ -12,10 +12,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.radiantmood.calarm.screen.ErrorModelContainer
-import com.radiantmood.calarm.screen.FinishedModelContainer
-import com.radiantmood.calarm.screen.LoadingModelContainer
-import com.radiantmood.calarm.screen.ModelContainer
+import com.radiantmood.calarm.screen.ErrorUiStateContainer
+import com.radiantmood.calarm.screen.FinishedUiStateContainer
+import com.radiantmood.calarm.screen.LoadingUiStateContainer
+import com.radiantmood.calarm.screen.UiStateContainer
 import com.radiantmood.calarm.ui.theme.CalarmTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -35,20 +35,20 @@ fun Fullscreen(content: @Composable ColumnScope.() -> Unit) {
 
 @Suppress("UNCHECKED_CAST")
 @Composable
-fun <T : ModelContainer<T>> ModelContainerContent(
-    modelContainer: ModelContainer<T>,
+fun <T : UiStateContainer<T>> UiStateContainerContent(
+    uiStateContainer: UiStateContainer<T>,
     finishedContent: @Composable (T) -> Unit
 ) {
 
-    Crossfade(targetState = modelContainer.key, modifier = Modifier.fillMaxSize()) {
-        val rememberedModelContainer = remember(it) { modelContainer }
+    Crossfade(targetState = uiStateContainer.key, modifier = Modifier.fillMaxSize()) {
+        val rememberedModelContainer = remember(it) { uiStateContainer }
         // rememberedModelContainer doesn't know the difference between two finished models. Always update to use the newer finished model, but don't crossfade between finished models.
         val model =
-            if (rememberedModelContainer is FinishedModelContainer && modelContainer is FinishedModelContainer) modelContainer else rememberedModelContainer
+            if (rememberedModelContainer is FinishedUiStateContainer && uiStateContainer is FinishedUiStateContainer) uiStateContainer else rememberedModelContainer
         when (model) {
-            is LoadingModelContainer<*> -> LoadingScreen()
-            is ErrorModelContainer<*> -> ErrorScreen(model)
-            is FinishedModelContainer<T> -> finishedContent(model as T)
+            is LoadingUiStateContainer<*> -> LoadingScreen()
+            is ErrorUiStateContainer<*> -> ErrorScreen(model)
+            is FinishedUiStateContainer<T> -> finishedContent(model as T)
         }
     }
 }
@@ -63,7 +63,7 @@ fun LoadingScreen() = Fullscreen {
 }
 
 @Composable
-fun ErrorScreen(errorContainer: ErrorModelContainer<*>) = Fullscreen {
+fun ErrorScreen(errorContainer: ErrorUiStateContainer<*>) = Fullscreen {
     val message = errorContainer.errorMessage ?: "An error has occured."
     Text(message)
 }
