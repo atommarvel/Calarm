@@ -2,7 +2,7 @@ package com.radiantmood.calarm.repo
 
 import android.content.Context
 import com.radiantmood.calarm.calarm
-import com.radiantmood.calarm.prefs.getPrefDelegate
+import com.radiantmood.calarm.common.getPrefDelegate
 
 object PrefsRepo {
 

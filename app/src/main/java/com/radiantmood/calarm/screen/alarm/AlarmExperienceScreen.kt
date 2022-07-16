@@ -1,4 +1,4 @@
-package com.radiantmood.calarm.screen
+package com.radiantmood.calarm.screen.alarm
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -16,7 +16,7 @@ import com.radiantmood.calarm.common.withNonNull
 import com.radiantmood.calarm.compose.ButtonUiState
 import com.radiantmood.calarm.compose.Fullscreen
 import com.radiantmood.calarm.compose.ModelContainerContent
-import com.radiantmood.calarm.screen.alarm.AlarmExperienceScreenUiState
+import com.radiantmood.calarm.screen.ModelContainer
 
 @Preview(showBackground = true)
 @Composable

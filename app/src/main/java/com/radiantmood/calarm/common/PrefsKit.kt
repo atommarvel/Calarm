@@ -1,4 +1,4 @@
-package com.radiantmood.calarm.prefs
+package com.radiantmood.calarm.common
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
