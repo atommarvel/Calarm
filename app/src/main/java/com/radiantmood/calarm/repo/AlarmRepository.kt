@@ -44,7 +44,7 @@ enum class EventPart {
         END -> calEvent.end
     }
 
-    operator fun plus(eventId: Int): String = eventId.toString() + this.name
+    operator fun plus(eventId: Int): String = this.name + eventId.toString()
 }
 
 @Entity

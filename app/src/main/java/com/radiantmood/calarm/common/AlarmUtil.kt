@@ -10,6 +10,7 @@ import com.radiantmood.calarm.activity.AlarmExperienceActivity
 import com.radiantmood.calarm.calarm
 import com.radiantmood.calarm.repo.EventPart
 import com.radiantmood.calarm.repo.UserAlarm
+import timber.log.Timber
 import java.io.Serializable
 import java.util.*
 
@@ -19,16 +20,28 @@ class AlarmUtil {
     private val am: AlarmManager by lazy { calarm.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
 
     fun scheduleAlarm(userAlarm: UserAlarm) {
+        Timber.appendToFile("Setting alarm")
         val time = userAlarm.calendar
         val pIntent = createPendingIntent(userAlarm)
         val info = AlarmManager.AlarmClockInfo(time.timeInMillis, pIntent)
+        Timber.appendToFile("UserAlarm: $userAlarm")
         am.setAlarmClock(info, pIntent)
         Toast.makeText(calarm, "Alarm set for ${time.formatTime()}", Toast.LENGTH_SHORT).show()
     }
 
     fun cancelAlarm(userAlarm: UserAlarm) {
+        Timber.appendToFile("Cancelling alarm")
         val pIntent = createPendingIntent(userAlarm)
         am.cancel(pIntent)
+    }
+
+    private fun logPendingIntent(userAlarm: UserAlarm) {
+        val sb = StringBuilder("pIntent(").apply {
+            append("requestCode=")
+            append(userAlarm.alarmId.hashCode())
+            append(")")
+        }
+        Timber.appendToFile(sb.toString())
     }
 
     @SuppressLint("WrongConstant")
@@ -37,8 +50,9 @@ class AlarmUtil {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         AlarmIntentData.fromUserAlarm(userAlarm).putInIntent(intent)
-        val pIntentFlags = Intent.FLAG_ACTIVITY_NEW_TASK or PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        // TODO: generate request code better
+        val pIntentFlags = PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        logPendingIntent(userAlarm)
+        // TODO: generate request code better?
         return PendingIntent.getActivity(calarm, userAlarm.alarmId.hashCode(), intent, pIntentFlags)
     }
 

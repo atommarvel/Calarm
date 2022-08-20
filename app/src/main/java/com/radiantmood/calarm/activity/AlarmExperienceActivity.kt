@@ -9,10 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.lifecycleScope
+import com.radiantmood.calarm.common.appendToFile
 import com.radiantmood.calarm.compose.render
 import com.radiantmood.calarm.screen.alarm.AlarmExperienceScreen
 import com.radiantmood.calarm.screen.LoadingUiStateContainer
 import com.radiantmood.calarm.screen.alarm.AlarmExperienceViewModel
+import timber.log.Timber
 
 
 class AlarmExperienceActivity : AppCompatActivity() {
@@ -21,6 +23,7 @@ class AlarmExperienceActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Timber.appendToFile("AlarmExperienceActivity.onCreate")
         showNoMatterWhat()
         lifecycleScope.launchWhenResumed {
             vm.startExperience(intent)
@@ -38,7 +41,7 @@ class AlarmExperienceActivity : AppCompatActivity() {
         vm.stopExperienceEvent.observe(this@AlarmExperienceActivity) {
             if (it == true) {
                 vm.consumeStopExperienceEvent()
-                // TODO: Find better alternative
+                // TODO: Find better alternative for closing the activity
                 finish()
             }
         }
