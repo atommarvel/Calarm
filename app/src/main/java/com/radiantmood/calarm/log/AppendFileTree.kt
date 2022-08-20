@@ -11,6 +11,11 @@ import java.nio.file.StandardOpenOption.APPEND
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * TODO:
+ *  - don't let the log file get infinitely large
+ *  - add a simple way to view the last ~100 log statements in-app
+ */
 class AppendFileTree : Timber.Tree() {
 
     private val path = Paths.get(calarm.filesDir.absolutePath, "calarm.log").apply {
