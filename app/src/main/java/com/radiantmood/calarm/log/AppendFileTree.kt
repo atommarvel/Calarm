@@ -1,6 +1,7 @@
 package com.radiantmood.calarm.log
 
 import android.app.Activity
+import android.widget.Toast
 import com.radiantmood.calarm.calarm
 import com.radiantmood.calarm.core.SimpleActivityLifecycleCallbacks
 import timber.log.Timber
@@ -19,7 +20,7 @@ import java.util.*
 class AppendFileTree : Timber.Tree() {
 
     private val path = Paths.get(calarm.filesDir.absolutePath, "calarm.log").apply {
-        createFileIfNotExisting(this)
+        prepFile(this)
     }
     private val buffer = Files.newBufferedWriter(path, APPEND)
 
@@ -43,9 +44,13 @@ class AppendFileTree : Timber.Tree() {
         }
     }
 
-    private fun createFileIfNotExisting(path: Path) {
+    private fun prepFile(path: Path) {
         if (Files.notExists(path)) {
-            Files.createFile(path);
+            Files.createFile(path)
+        } else {
+            if (Files.size(path) / 1024 > 100_000) {
+                Toast.makeText(calarm, "The log file is >100MB!", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
